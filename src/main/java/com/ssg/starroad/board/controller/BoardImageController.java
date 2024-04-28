@@ -1,0 +1,13 @@
+package com.ssg.starroad.board.controller;
+
+import com.ssg.starroad.board.service.BoardImageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/board-image")
+public class BoardImageController {
+    private final BoardImageService boardImageService;
+}

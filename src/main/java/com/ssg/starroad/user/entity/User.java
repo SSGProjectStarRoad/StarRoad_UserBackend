@@ -21,8 +21,6 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(unique = true)
-    private String username;
     private String password; // bcrypt
     private String name;
     @Column(unique = true)

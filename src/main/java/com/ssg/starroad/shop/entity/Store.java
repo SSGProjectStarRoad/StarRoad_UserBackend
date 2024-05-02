@@ -32,5 +32,8 @@ public class Store extends BaseTimeEntity {
     private String contents;
     private int floor;
     private String operatingTime; // hh:mm ~ hh:mm format
-    private String contactNumber;
+    private String contactNumber; // 연락처
+    private String storeGuideMap; // 가게 안내도 이미지
+    private Long ReviewCount; // 리뷰 수
+
 }

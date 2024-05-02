@@ -30,7 +30,7 @@ public class Review extends BaseTimeEntity {
 
     private boolean visible;
 
-    private int likeCount;
+    private Long likeCount;
 
     private String paymentNum;
 

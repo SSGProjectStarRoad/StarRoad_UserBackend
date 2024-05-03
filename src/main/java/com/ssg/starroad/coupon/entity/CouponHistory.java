@@ -30,4 +30,7 @@ public class CouponHistory extends BaseTimeEntity {
     private boolean usageStatus;
     private LocalDate expiredAt;
 
+    public void useCoupon(){
+        this.usageStatus=true;
+    }
 }

@@ -347,6 +347,9 @@ gradle-app.setting
 # Java heap dump
 *.hprof
 
+### log files ###
+*.log
+
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij,intellij+iml,intellij+all,gradle,windows,macos
 
 src/main/resources/application.properties

@@ -15,6 +15,7 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+	all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
 }
 
 repositories {
@@ -27,14 +28,33 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	// LOMBOK
 	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
+
+	// SPRING BOOT DEVTOOLS
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	// DATABASE MYSQL
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	// MODEL MAPPER
+	implementation 'org.modelmapper:modelmapper:3.1.1'
+
+	// TEST IMPLEMENTATION ========================
+	// TEST DATABASE H2
+	testImplementation 'com.h2database:h2'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// TEST LOG4J2
+	testImplementation 'org.springframework.boot:spring-boot-starter-log4j2'
+	testImplementation 'org.apache.logging.log4j:log4j-slf4j-impl'
+	testImplementation 'org.apache.logging.log4j:log4j-api'
+
+	// TEST JUNIT
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
-	testCompileOnly 'org.projectlombok:lombok'
-	testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('bootBuildImage') {

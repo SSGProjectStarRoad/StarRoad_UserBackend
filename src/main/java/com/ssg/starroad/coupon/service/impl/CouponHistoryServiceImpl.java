@@ -7,6 +7,7 @@ import com.ssg.starroad.coupon.entity.CouponHistory;
 import com.ssg.starroad.coupon.entity.QCouponHistory;
 import com.ssg.starroad.coupon.repository.CouponHistoryRepository;
 import com.ssg.starroad.coupon.repository.CouponRepository;
+import com.ssg.starroad.coupon.repository.impl.CouponHistoryRepositoryCustom;
 import com.ssg.starroad.coupon.service.CouponHistoryService;
 import com.ssg.starroad.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
     private final UserRepository userRepository;
     private final CouponRepository couponRepository;
     private final CouponHistoryRepository couponHistoryRepository;
+    private final CouponHistoryRepositoryCustom couponHistoryRepositoryCustom;
 
     @Override
     public void issueCoupon(Long userID, Long couponID) {
@@ -40,11 +42,9 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
 
     @Override
     public boolean updateCouponUsage(Long couponID, boolean couponUsageStatus) {
-        QCouponHistory qCouponHistory = QCouponHistory.couponHistory;
-        BooleanExpression query = qCouponHistory.id.eq(couponID).and(qCouponHistory.usageStatus.eq(false));
 
         // 쿠폰 조회
-        Optional<CouponHistory> optionalCouponHistory = couponHistoryRepository.findOne(query);
+        Optional<CouponHistory> optionalCouponHistory = couponHistoryRepositoryCustom.findByCouponId(couponID,couponUsageStatus);
         if (optionalCouponHistory.isPresent() && !couponUsageStatus) {
             CouponHistory couponHistory = optionalCouponHistory.get();
             couponHistory.useCoupon(); // 상태를 true로 변경

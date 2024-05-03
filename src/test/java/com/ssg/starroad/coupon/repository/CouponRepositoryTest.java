@@ -6,7 +6,8 @@ import com.ssg.starroad.user.entity.User;
 import com.ssg.starroad.user.enums.ActiveStatus;
 import com.ssg.starroad.user.enums.Gender;
 import com.ssg.starroad.user.repository.UserRepository;
-import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -17,9 +18,9 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
-@Log4j2
 public class CouponRepositoryTest {
 
+    private static final Logger log = LogManager.getLogger(CouponRepositoryTest.class);
     @Autowired
     private CouponRepository couponRepository;
 
@@ -54,7 +55,6 @@ public class CouponRepositoryTest {
         couponHistoryService.issueCoupon(1L,1L);
         log.info("check issue coupon: {}", couponHistoryRepository.findById(1L));
     }
-
 //    @Test
 //    public void testSaveUser(){
 //        // User 엔티티 생성

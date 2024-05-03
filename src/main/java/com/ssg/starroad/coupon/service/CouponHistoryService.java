@@ -7,4 +7,5 @@ public interface CouponHistoryService {
     public void issueCoupon(Long userID, Long couponID);
 
     public CouponDTO getCouponById(Long couponID);
+    public boolean updateCouponUsage(Long couponID, boolean couponUsageStatus);
 }

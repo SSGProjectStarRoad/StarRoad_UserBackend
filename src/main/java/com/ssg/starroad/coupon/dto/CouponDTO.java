@@ -1,14 +1,12 @@
 package com.ssg.starroad.coupon.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class CouponDTO {
@@ -19,7 +17,7 @@ public class CouponDTO {
     private String couponStatus;
     private boolean couponUsageStatus;
     private LocalDate couponExpiredAt;
-    private String couponStoreType;
+    private String couponShopType;
     private int couponMinAmount;
     private int couponMaxAmount;
 }

@@ -16,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +46,7 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
     public boolean updateCouponUsage(Long couponID, boolean couponUsageStatus) {
 
         // 쿠폰 조회
-        Optional<CouponHistory> optionalCouponHistory = couponHistoryRepositoryCustom.findByCouponId(couponID,couponUsageStatus);
+        Optional<CouponHistory> optionalCouponHistory = couponHistoryRepositoryCustom.findByCouponId(couponID);
         if (optionalCouponHistory.isPresent() && !couponUsageStatus) {
             CouponHistory couponHistory = optionalCouponHistory.get();
             couponHistory.useCoupon(); // 상태를 true로 변경
@@ -52,5 +54,11 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
             return true; // 성공적으로 업데이트 되었다면 true 반환
         }
         return false; // 쿠폰을 찾지 못했거나 이미 사용 중이라면 false 반환
+    }
+
+    @Override
+    public List<CouponDTO> getCouponsByUserID(Long userID) {
+        return couponHistoryRepositoryCustom.findCouponsByUserId(userID).stream()
+                .map(coupon -> modelMapper.map(coupon, CouponDTO.class)).toList();
     }
 }

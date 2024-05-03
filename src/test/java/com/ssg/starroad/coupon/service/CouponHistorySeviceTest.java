@@ -31,8 +31,12 @@ public class CouponHistorySeviceTest {
 
     @Test
     public void testupdateCouponUsage(){
-        couponHistoryService.updateCouponUsage(1L,false);
-        log.info("coupon status: {} ",couponHistoryRepository.findById(1L));
+        couponHistoryService.updateCouponUsage(2L,false);
+        log.info("coupon status: {} ",couponHistoryRepository.findById(2L));
+    }
+    @Test
+    public void testgetCouponsByUserID(){
+        log.info("user coupons:{}",couponHistoryService.getCouponsByUserID(4L));
     }
 
 }

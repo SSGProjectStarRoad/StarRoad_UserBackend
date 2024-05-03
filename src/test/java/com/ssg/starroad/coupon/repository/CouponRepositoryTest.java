@@ -1,6 +1,8 @@
 package com.ssg.starroad.coupon.repository;
 
 import com.ssg.starroad.coupon.entity.Coupon;
+import com.ssg.starroad.coupon.entity.CouponHistory;
+import com.ssg.starroad.coupon.repository.impl.CouponHistoryRepositoryCustom;
 import com.ssg.starroad.coupon.service.CouponHistoryService;
 import com.ssg.starroad.user.entity.User;
 import com.ssg.starroad.user.enums.ActiveStatus;
@@ -30,14 +32,17 @@ public class CouponRepositoryTest {
     @Autowired
     private CouponHistoryRepository couponHistoryRepository;
 
+    @Autowired
+    private CouponHistoryRepositoryCustom couponHistoryRepositoryCustom;
 
-//    @Autowired
-//    private UserRepository userRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     public void testSaveCoupon() {
         // 쿠폰 엔티티 생성
-        Coupon coupon = new Coupon(1L,"Complex", "Fashion", "Summer Sale", 1000, 10, 5000, 10000, "Active", LocalDate.now().plusDays(30));
+        Coupon coupon = new Coupon(null,"Complex2", "Food", "Summer Sale", 1000, 10, 5000, 10000, "Active", LocalDate.now().plusDays(7));
 
         // 쿠폰 저장
         Coupon savedCoupon = couponRepository.save(coupon);
@@ -52,8 +57,19 @@ public class CouponRepositoryTest {
 
     @Test
     public void testIssueCoupon() {
-        couponHistoryService.issueCoupon(1L,1L);
-        log.info("check issue coupon: {}", couponHistoryRepository.findById(1L));
+        couponHistoryService.issueCoupon(4L,3L);
+//        log.info("check issue coupon: {}", couponHistoryRepository.findById(1L));
+    }
+
+    @Test
+    public void testfindByUserId(){
+        Long userId = 1L;
+        Iterable<Coupon> Coupons = couponHistoryRepositoryCustom.findCouponsByUserId(userId);
+
+        // couponHistories를 반복하여 각 객체의 정보를 로그에 출력
+        for (Coupon Coupon : Coupons) {
+            log.info("Coupon History: {}", Coupon);
+        }
     }
 //    @Test
 //    public void testSaveUser(){
@@ -62,13 +78,13 @@ public class CouponRepositoryTest {
 //                null,  // ID는 데이터베이스에 의해 자동 생성되므로 null을 전달
 //                "securepassword",  // bcrypt로 인코딩된 비밀번호 가정
 //                "John Doe",
-//                "johnny",
+//                "hriver",
 //                null,  // imagePath, 현재 null로 설정, 필요에 따라 수정
 //                Gender.MALE,
 //                LocalDate.of(1990, 1, 1),
 //                "010-1234-5678",
-//                "john.doe@example.com",
-//                "local",
+//                "river.doe@example.com",
+//                "local1",
 //                0,  // reviewExp
 //                100, // point
 //                ActiveStatus.ACTIVE

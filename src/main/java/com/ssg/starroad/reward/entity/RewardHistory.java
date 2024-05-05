@@ -25,6 +25,6 @@ public class RewardHistory extends BaseTimeEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private int rewardId;
+    private Long rewardId;
 
 }

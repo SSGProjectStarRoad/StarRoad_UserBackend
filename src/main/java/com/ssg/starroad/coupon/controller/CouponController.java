@@ -22,7 +22,7 @@ public class CouponController {
     @PostMapping("/{coupon_id}/issue")
     public ResponseEntity<String> issueCoupon(@RequestBody IssueCouponRequest request) {
         // 로직 구현 부분, 예를 들어 쿠폰 발급 로직
-        couponHistoryService.issueCoupon(request.getUserId(), request.getCouponId());
+        couponHistoryService.CouponUserAdd(request.getUserId(), request.getCouponId());
 
         // 성공 응답 반환
         return ResponseEntity.ok("Coupon issued successfully to user ID " + request.getUserId());

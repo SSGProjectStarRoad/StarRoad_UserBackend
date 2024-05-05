@@ -1,6 +1,7 @@
 package com.ssg.starroad.reward.service.impl;
 
 import com.ssg.starroad.reward.DTO.RewardDTO;
+import com.ssg.starroad.reward.DTO.RewardMemberDTO;
 import com.ssg.starroad.reward.repository.RewardRepository;
 import com.ssg.starroad.reward.service.RewardService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,9 @@ public class RewardServiceImpl implements RewardService {
     public List<RewardDTO> getRewardList(){
         List<RewardDTO> rewardDTOs = rewardRepository.findAll().stream()
                 .map(reward -> modelMapper.map(reward,RewardDTO.class)).toList();
+
         return rewardDTOs;
-    };
+    }
+
 
 }

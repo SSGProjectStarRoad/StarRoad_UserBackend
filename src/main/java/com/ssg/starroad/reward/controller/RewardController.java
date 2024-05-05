@@ -20,7 +20,7 @@ public class RewardController {
     public ResponseEntity<?> RewardList (){
         List<RewardDTO> rewardDTOS = rewardService.getRewardList();
         if (rewardDTOS.isEmpty()) {
-            return ResponseEntity.noContent().build();  // 내용이 없을 경우 No Content (204) 반환
+            return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(rewardDTOS);  // 내용이 있을 경우 OK (200)와 함께 데이터 반환
     }

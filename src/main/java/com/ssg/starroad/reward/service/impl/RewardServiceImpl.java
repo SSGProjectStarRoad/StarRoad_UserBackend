@@ -19,6 +19,7 @@ public class RewardServiceImpl implements RewardService {
     public List<RewardDTO> getRewardList(){
         List<RewardDTO> rewardDTOs = rewardRepository.findAll().stream()
                 .map(reward -> modelMapper.map(reward,RewardDTO.class)).toList();
+
         return rewardDTOs;
     };
 

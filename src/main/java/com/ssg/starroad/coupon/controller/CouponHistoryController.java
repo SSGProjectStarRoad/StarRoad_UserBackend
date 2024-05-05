@@ -21,7 +21,7 @@ public class CouponHistoryController {
 
     @GetMapping("/{coupon_history_id}")
     public ResponseEntity<CouponDTO> getCoupon(@PathVariable("coupon_history_id") Long couponId) {
-        CouponDTO coupon=couponHistoryService.getCouponById(couponId);
+        CouponDTO coupon=couponHistoryService.CouponDetails(couponId);
         if (coupon.getCouponId()==0) {
             return ResponseEntity.noContent().build();  // 내용이 없을 경우 No Content (204) 반환
         }
@@ -30,7 +30,7 @@ public class CouponHistoryController {
 
     @PatchMapping("/{couponHistoryId}/use")
     public ResponseEntity<?> updateCouponUsage(@PathVariable("couponHistoryId") Long couponId, @RequestBody CouponUsageDTO couponUsageDTO) {
-        boolean updated = couponHistoryService.updateCouponUsage(couponId, couponUsageDTO.isCouponUsageStatus());
+        boolean updated = couponHistoryService.CouponUsageModify(couponId, couponUsageDTO.isCouponUsageStatus());
         if (updated) {
             return ResponseEntity.ok().build();
         } else {
@@ -40,7 +40,7 @@ public class CouponHistoryController {
 
     @GetMapping("/{userId}/coupon/list")
     public ResponseEntity<List<CouponDTO>> getUserCoupons(@PathVariable Long userId) {
-        List<CouponDTO> coupons = couponHistoryService.getCouponsByUserID(userId);
+        List<CouponDTO> coupons = couponHistoryService.CouponsUserList(userId);
         if (coupons.isEmpty()) {
             return ResponseEntity.noContent().build();  // 내용이 없을 경우 No Content (204) 반환
         }

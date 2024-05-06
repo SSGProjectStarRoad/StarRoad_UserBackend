@@ -43,7 +43,7 @@ public class RewardHistoryServiceImpl implements RewardHistoryService {
             RewardHistoryDTO dto = RewardHistoryDTO.builder()
                     .rewardId(record.get(0, Long.class))
                     .rewardName(record.get(1, String.class))
-                    .count(Objects.requireNonNull(record.get(2, Integer.class)))
+                    .count(Objects.requireNonNull(record.get(2, Long.class)))
                     .build();
             result.add(dto);
         }

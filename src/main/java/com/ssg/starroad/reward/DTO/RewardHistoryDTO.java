@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class RewardHistoryDTO {
 
     @JsonProperty("reward_id")
@@ -19,6 +20,6 @@ public class RewardHistoryDTO {
     private String rewardName;
 
     @JsonProperty("reward_count")
-    private int count;
+    private Long count;
 
 }

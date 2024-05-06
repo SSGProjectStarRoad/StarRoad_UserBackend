@@ -57,7 +57,7 @@ public class CouponRepositoryTest {
 
     @Test
     public void testIssueCoupon() {
-        couponHistoryService.issueCoupon(4L,3L);
+        couponHistoryService.CouponUserAdd(4L,3L);
 //        log.info("check issue coupon: {}", couponHistoryRepository.findById(1L));
     }
 

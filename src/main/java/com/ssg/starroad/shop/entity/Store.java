@@ -1,6 +1,10 @@
 package com.ssg.starroad.shop.entity;
 
 import com.ssg.starroad.common.entity.BaseTimeEntity;
+import com.ssg.starroad.review.entity.Review;
+import com.ssg.starroad.review.entity.ReviewImage;
+import com.ssg.starroad.review.entity.ReviewSelection;
+import com.ssg.starroad.shop.DTO.StoreDTO;
 import com.ssg.starroad.user.entity.Manager;
 import com.ssg.starroad.user.entity.User;
 import jakarta.persistence.*;
@@ -36,5 +40,6 @@ public class Store extends BaseTimeEntity {
     private String contactNumber; // 연락처
     private String storeGuideMap; // 가게 안내도 이미지
     private Long ReviewCount; // 리뷰 수
+
 
 }

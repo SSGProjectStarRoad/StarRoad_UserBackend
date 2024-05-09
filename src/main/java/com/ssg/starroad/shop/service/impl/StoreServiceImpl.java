@@ -9,6 +9,7 @@ import com.ssg.starroad.review.repository.ReviewImageRepository;
 import com.ssg.starroad.review.repository.ReviewRepository;
 import com.ssg.starroad.review.service.ReviewFeedbackService;
 import com.ssg.starroad.review.service.ReviewImageService;
+import com.ssg.starroad.review.service.ReviewService;
 import com.ssg.starroad.reward.DTO.RewardDTO;
 import com.ssg.starroad.shop.DTO.StoreDTO;
 import com.ssg.starroad.shop.DTO.StoreWithReviewDTO;
@@ -32,6 +33,7 @@ public class StoreServiceImpl implements StoreService {
     private final ReviewImageRepository reviewImageRepository; // ReviewImageRepository 인젝션
     private final ReviewImageService reviewImageService; // ReviewImageService 인젝션
     private final ReviewFeedbackService reviewFeedbackService;
+    private final ReviewService reviewService;
 
     @Override
     public List<StoreDTO> searchStoreList(Long id) {
@@ -57,16 +59,20 @@ public class StoreServiceImpl implements StoreService {
                 .map(review -> {
                     List<ReviewImageDTO> reviewImageDTOs = reviewImageService.getReviewImages(review.getId());
                    List<ReviewFeedbackDTO> reviewFeedbackDTOs = reviewFeedbackService.getReviewFeedback(review.getId());
+                    Long userReviewCount = reviewService.countReviewsByUserId(review.getUser().getId());
 
                     return ReviewDTO.builder()
                             .id(review.getId())
                             .userId(review.getUser().getId())
+                            .userNickname(review.getUser().getNickname())
                             .storeId(review.getStore().getId())
                             .visible(review.isVisible())
+                            .createDate(review.getCreatedAt())
                             .likeCount(review.getLikeCount())
                             .contents(review.getContents())
                             .summary(review.getSummary())
                             .confidence(review.getConfidence())
+                            .reviewcount(userReviewCount)
                             .reviewImages(reviewImageDTOs)
                             .reviewFeedbacks(reviewFeedbackDTOs)
                             .build();
@@ -76,13 +82,33 @@ public class StoreServiceImpl implements StoreService {
         // 매장 정보와 리뷰 정보를 포함한 StoreWithReviewDTO를 생성하여 반환합니다.
         return StoreWithReviewDTO.builder()
                 .id(store.getId())
+                .contents(store.getContents())
+                .operatingTime(store.getOperatingTime())
                 .name(store.getName())
-                .floor(store.getFloor())
+                .floor(store.getFloor().getFloor())
                 .storeGuideMap(store.getStoreGuideMap())
                 .contactNumber(store.getContactNumber())
                 .imagePath(store.getImagePath())
                 .storeType(store.getStoreType())
                 .reviews(reviewDTOList)
                 .build();
+    }
+
+    @Override
+    public StoreDTO findStore(Long id) {
+        Store store = storeRepository.findById(id).orElseThrow(() -> new RuntimeException("존재하지 않은 매장입니다"));
+
+        StoreDTO storeDTO = StoreDTO.builder()
+                .id(store.getId())
+                .imagePath(store.getImagePath())
+                .storeGuideMap(store.getStoreGuideMap())
+                .name(store.getName())
+                .floor(store.getFloor().getFloor())
+                        .build();
+
+
+
+
+        return storeDTO;
     }
 }

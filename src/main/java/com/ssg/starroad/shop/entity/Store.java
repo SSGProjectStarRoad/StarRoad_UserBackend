@@ -5,6 +5,7 @@ import com.ssg.starroad.review.entity.Review;
 import com.ssg.starroad.review.entity.ReviewImage;
 import com.ssg.starroad.review.entity.ReviewSelection;
 import com.ssg.starroad.shop.DTO.StoreDTO;
+import com.ssg.starroad.shop.enums.Floor;
 import com.ssg.starroad.user.entity.Manager;
 import com.ssg.starroad.user.entity.User;
 import jakarta.persistence.*;
@@ -35,7 +36,8 @@ public class Store extends BaseTimeEntity {
     private String storeType; // 입점 매장 카테고리(TYPE)
     private String imagePath; // 매장 로고
     private String contents; // 매장 소개글
-    private int floor; // 매장 층수
+    @Enumerated(EnumType.STRING)
+    private Floor floor; // 매장 층수
     private String operatingTime; // hh:mm ~ hh:mm format
     private String contactNumber; // 연락처
     private String storeGuideMap; // 가게 안내도 이미지

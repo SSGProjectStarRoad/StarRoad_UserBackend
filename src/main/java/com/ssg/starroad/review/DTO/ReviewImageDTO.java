@@ -15,8 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class ReviewImageDTO {
-    @Embedded
-    private List<Review> reviews;
+
     private Long id;
     private Long reviewId;
     private String imagePath;

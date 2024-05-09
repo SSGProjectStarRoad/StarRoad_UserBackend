@@ -4,7 +4,9 @@ import com.ssg.starroad.config.jwt.TokenProvider;
 import com.ssg.starroad.user.dto.LoginRequest;
 import com.ssg.starroad.user.dto.LoginResponse;
 import com.ssg.starroad.user.entity.User;
+import com.ssg.starroad.user.service.RefreshTokenService;
 import com.ssg.starroad.user.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,10 +23,12 @@ public class UserController {
 
     private final UserService userService;
     private final TokenProvider tokenProvider;
+    private final RefreshTokenService refreshTokenService;
 
-    public UserController(UserService userService, TokenProvider tokenProvider) {
+    public UserController(UserService userService, TokenProvider tokenProvider, RefreshTokenService refreshTokenService) {
         this.userService = userService;
         this.tokenProvider = tokenProvider;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @PostMapping("/login")

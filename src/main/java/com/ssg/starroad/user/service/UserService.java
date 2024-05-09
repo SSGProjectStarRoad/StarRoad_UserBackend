@@ -8,6 +8,8 @@ public interface UserService extends UserDetailsService {
 
     User findById(Long userId);
 
+    User findByEmail(String email);
+
     Long save(UserDTO userDTO);
 
     boolean validateUser(String email, String password);

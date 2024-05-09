@@ -47,7 +47,7 @@ public class TokenProvider {
                 .setIssuedAt(now) // 토큰 발급 시간
                 .setExpiration(expiry) // 토큰 만료 시간
                 .setSubject(user.getEmail()) // 사용자 이메일
-                .claim("id", user.getId()) // 추가 정보 클레임 id : 유저 아이디
+                .claim("userId", user.getId()) // 추가 정보 클레임 id : 유저 아이디
                 // 토큰에 사용자 고유 id 정보 담아 토큰 해석 시 사용자 정보 접근에 용이
                 // 서명 비밀값과 합께 해시값을 HS256 방식으로 암호화
                 .signWith(key)
@@ -84,7 +84,7 @@ public class TokenProvider {
     // 토큰에서 사용자 id 추출
     public Long getUserId(String token) {
         Claims claims = getClaims(token);
-        return claims.get("id", Long.class);
+        return claims.get("userId", Long.class);
     }
 
     // 토큰에서 클레임을 추출하는 보조 메소드

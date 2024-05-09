@@ -3,6 +3,7 @@ package com.ssg.starroad.user.entity;
 import com.ssg.starroad.common.entity.BaseTimeEntity;
 import com.ssg.starroad.user.enums.ActiveStatus;
 import com.ssg.starroad.user.enums.Gender;
+import com.ssg.starroad.user.enums.ProviderType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Past;
@@ -24,7 +25,10 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Getter
-@Builder
+@Builder(toBuilder = true)
+// User 객체의 현재 상태를 기반으로 새로운 User 객체를 쉽게 생성
+// 예를 들어, 특정 속성만 변경하고 나머지는 기존 값으로 유지하려는 경우,
+// toBuilder() 메소드를 사용하여 빌더를 얻고, 변경할 속성만 설정한 다음 build() 메소드를 호출하면 됨
 @Entity
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor
@@ -65,8 +69,8 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Email(message = "유효한 이메일 주소여야 합니다.")
     private String email;
 
-    @Column(unique = true)
-    private String provider; // provider + providerId => unique
+    private ProviderType providerType; // 네이버, 카카오, 구글
+    private String providerId; // (네이버, 카카오, 구글)에서 받아온 아이디
 
     private int reviewExp;
     private int point;
@@ -113,4 +117,5 @@ public class User extends BaseTimeEntity implements UserDetails {
         // activeStatus가 ACTIVE인 경우에만 true 반환
         return this.activeStatus == ActiveStatus.ACTIVE;
     }
+
 }

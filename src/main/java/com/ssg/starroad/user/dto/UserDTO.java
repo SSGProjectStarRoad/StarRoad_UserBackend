@@ -2,6 +2,7 @@ package com.ssg.starroad.user.dto;
 
 import com.ssg.starroad.user.enums.ActiveStatus;
 import com.ssg.starroad.user.enums.Gender;
+import com.ssg.starroad.user.enums.ProviderType;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -21,7 +22,8 @@ public class UserDTO {
     private LocalDate birth;
     private String phone;
     private String imagePath;
-    private String provider;
+    private ProviderType providerType;
+    private String providerId;
     private int reviewExp;
     private int point;
     private ActiveStatus activeStatus;

@@ -39,7 +39,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Unexpected user"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
     }
 
 
@@ -54,7 +60,8 @@ public class UserServiceImpl implements UserService {
                 .gender(userDTO.getGender())
                 .birth(userDTO.getBirth())
                 .phone(userDTO.getPhone())
-                .provider(userDTO.getProvider())
+                .providerType(userDTO.getProviderType())
+                .providerId(userDTO.getProviderId())
                 .reviewExp(userDTO.getReviewExp())
                 .point(userDTO.getPoint())
                 .activeStatus(userDTO.getActiveStatus())

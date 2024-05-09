@@ -15,10 +15,10 @@ public class RewardProcessController {
     private final RewardProcessService rewardProcessService;
 
 
-    @PostMapping("/{userId}/start")
-    public ResponseEntity<?> startRewardProcess(@PathVariable Long userId, @RequestBody RewardProcessDTO rewardProcessDTO) {
+    @GetMapping("/{userId}/start")
+    public ResponseEntity<?> startRewardProcess(@PathVariable Long userId) {
         // 여기서 userId와 DTO를 이용하여 처리 로직 호출
-        rewardProcessService.startRewardProcess(userId, rewardProcessDTO);
+        rewardProcessService.startRewardProcess(userId);
         return ResponseEntity.ok().build();
     }
 

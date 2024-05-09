@@ -21,19 +21,15 @@ public class RewardProcessServiceImpl implements RewardProcessService {
 
     @Override
     @Transactional
-    public void startRewardProcess(Long userId, RewardProcessDTO rewardProcessDTO) {
-        Optional<RewardProcess> optionalrewardProcess=rewardProcessRepository.findById(userId);
-        if(optionalrewardProcess.isEmpty()){
-            rewardProcessRepository.save(new RewardProcess(userId, rewardProcessDTO));
-        }
-        else {
-            RewardProcess rewardProcess = optionalrewardProcess.get();
-            rewardProcess.setRewardStatus(false);
-            rewardProcess.setExpiredAt(LocalDate.now().plusDays(7));
-            rewardProcess.setReviewCount(0);
-            rewardProcess.setCouponCount(0);
-            rewardProcessRepository.save(rewardProcess);
-        }
+    public void startRewardProcess(Long userId) {
+        RewardProcess rewardProcess = rewardProcessRepository.findById(userId)
+                .orElse(new RewardProcess(userId));  // 존재하지 않는 경우 새 객체 생성
+
+        rewardProcess.setRewardStatus(false);  // 기존 로직대로 상태 설정
+        rewardProcess.setExpiredAt(LocalDate.now().plusDays(7));
+        rewardProcess.setReviewCount(0);
+        rewardProcess.setCouponCount(0);
+        rewardProcessRepository.save(rewardProcess);  // 저장
     }
 
     @Override

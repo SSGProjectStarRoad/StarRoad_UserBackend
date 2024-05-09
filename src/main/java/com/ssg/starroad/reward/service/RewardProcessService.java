@@ -3,7 +3,7 @@ package com.ssg.starroad.reward.service;
 import com.ssg.starroad.reward.DTO.RewardProcessDTO;
 
 public interface RewardProcessService {
-    public void startRewardProcess(Long userId, RewardProcessDTO rewardProcessDTO);
+    public void startRewardProcess(Long userId);
 
     public void updateCouponCount(Long userId);
 

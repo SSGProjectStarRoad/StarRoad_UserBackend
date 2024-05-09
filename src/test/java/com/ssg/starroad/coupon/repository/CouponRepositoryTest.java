@@ -1,5 +1,6 @@
 package com.ssg.starroad.coupon.repository;
 
+import com.querydsl.core.Tuple;
 import com.ssg.starroad.coupon.entity.Coupon;
 import com.ssg.starroad.coupon.entity.CouponHistory;
 import com.ssg.starroad.coupon.repository.impl.CouponHistoryRepositoryCustom;
@@ -63,14 +64,14 @@ public class CouponRepositoryTest {
 
     @Test
     public void testfindByUserId(){
-        Long userId = 1L;
-        Iterable<Coupon> Coupons = couponHistoryRepositoryCustom.findCouponsByUserId(userId);
+//        Long userId = 1L;
+//        Iterable<Tuple> Coupons = couponHistoryRepositoryCustom.findCouponsByUserId(userId);
 
-        // couponHistories를 반복하여 각 객체의 정보를 로그에 출력
-        for (Coupon Coupon : Coupons) {
-            log.info("Coupon History: {}", Coupon);
-        }
-    }
+//        // couponHistories를 반복하여 각 객체의 정보를 로그에 출력
+//        for (Coupon Coupon : Coupons) {
+//            log.info("Coupon History: {}", Coupon);
+//        }
+//    }
 //    @Test
 //    public void testSaveUser(){
 //        // User 엔티티 생성

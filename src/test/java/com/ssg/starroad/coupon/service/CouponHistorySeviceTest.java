@@ -31,7 +31,7 @@ public class CouponHistorySeviceTest {
 
     @Test
     public void testupdateCouponUsage(){
-        couponHistoryService.CouponUsageModify(2L,false);
+        couponHistoryService.CouponUsageModify(2L);
         log.info("coupon status: {} ",couponHistoryRepository.findById(2L));
     }
     @Test

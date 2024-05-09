@@ -16,7 +16,7 @@ public interface CouponHistoryService {
 
 
 
-    boolean CouponUsageModify(Long couponID, boolean couponUsageStatus);
+    boolean CouponUsageModify(Long couponID);
 
 
 

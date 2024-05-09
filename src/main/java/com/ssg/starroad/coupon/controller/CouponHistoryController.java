@@ -25,9 +25,9 @@ public class CouponHistoryController {
         return ResponseEntity.ok(coupon);  // 내용이 있을 경우 OK (200)와 함께 데이터 반환
     }
 
-    @PatchMapping("/{couponHistoryId}/use")
-    public ResponseEntity<?> updateCouponUsage(@PathVariable("couponHistoryId") Long couponId, @RequestBody CouponUsageDTO couponUsageDTO) {
-        boolean updated = couponHistoryService.CouponUsageModify(couponId, couponUsageDTO.isCouponUsageStatus());
+    @GetMapping("/{coupon_history_id}/use")
+    public ResponseEntity<?> updateCouponUsage(@PathVariable("coupon_history_id") Long couponHistoryId) {
+        boolean updated = couponHistoryService.CouponUsageModify(couponHistoryId);
         if (updated) {
             return ResponseEntity.ok().build();
         } else {

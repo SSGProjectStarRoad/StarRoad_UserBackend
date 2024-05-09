@@ -18,12 +18,15 @@ public class CouponController {
 
     private final CouponHistoryService couponHistoryService;
 
-    @PostMapping("/{coupon_id}/issue")
+    @PostMapping("/issue")
     public ResponseEntity<String> issueCoupon(@RequestBody IssueCouponRequest request) {
-        // 로직 구현 부분, 예를 들어 쿠폰 발급 로직
+
+        if (request.getUserId() == null || request.getCouponId() == null) {
+            return ResponseEntity.badRequest().body("UserId or CouponId cannot be null");
+        }
+
         couponHistoryService.CouponUserAdd(request.getUserId(), request.getCouponId());
 
-        // 성공 응답 반환
         return ResponseEntity.ok("Coupon issued successfully to user ID " + request.getUserId());
     }
     @GetMapping("/{userId}/coupon/list")

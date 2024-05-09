@@ -38,11 +38,11 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
     }
 
     @Override
-    public boolean CouponUsageModify(Long couponID, boolean couponUsageStatus) {
+    public boolean CouponUsageModify(Long couponHistoryId) {
 
         // 쿠폰 조회
-        Optional<CouponHistory> optionalCouponHistory = couponHistoryRepositoryCustom.findByCouponId(couponID);
-        if (optionalCouponHistory.isPresent() && !couponUsageStatus) {
+        Optional<CouponHistory> optionalCouponHistory = couponHistoryRepository.findById(couponHistoryId);
+        if (optionalCouponHistory.isPresent()) {
             CouponHistory couponHistory = optionalCouponHistory.get();
             couponHistory.useCoupon(); // 상태를 true로 변경
             couponHistoryRepository.save(couponHistory); // 변경 사항 저장
@@ -53,7 +53,6 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
 
     @Override
     public List<CouponDTO> CouponsUserList(Long userID) {
-        return couponHistoryRepositoryCustom.findCouponsByUserId(userID).stream()
-                .map(coupon -> modelMapper.map(coupon, CouponDTO.class)).toList();
+        return couponHistoryRepositoryCustom.findCouponsByUserId(userID);
     }
 }

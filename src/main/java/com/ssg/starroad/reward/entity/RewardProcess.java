@@ -19,14 +19,14 @@ import static lombok.AccessLevel.PROTECTED;
 @Table(name = "REWARD_PROCESS")
 public class RewardProcess {
 
-    @Id
-    @OneToOne
-    @JoinColumn(name = "ID", referencedColumnName = "ID")
-    private User user;
-
 //    @Id
-//    @Column(name = "USER_ID")
-//    private int userId;
+//    @OneToOne
+//    @JoinColumn(name = "ID", referencedColumnName = "ID")
+//    private User user;
+
+    @Id
+    @Column(name = "USER_ID")
+    private int userId;
 
     @Column(name = "REVIEW_COUNT", nullable = false)
     private int reviewCount = 0;

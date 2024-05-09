@@ -12,6 +12,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
+@Embeddable
 public class ReviewComment extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)

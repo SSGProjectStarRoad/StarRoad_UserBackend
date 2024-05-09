@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ReviewRequest {
+public class ReviewRequestDTO {
     private User user;
 
     private Store store;

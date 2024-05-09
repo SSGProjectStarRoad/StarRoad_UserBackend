@@ -1,6 +1,6 @@
 package com.ssg.starroad.review.controller;
 
-import com.ssg.starroad.review.dto.ReviewRequest;
+import com.ssg.starroad.review.dto.ReviewRequestDTO;
 import com.ssg.starroad.review.entity.Review;
 import com.ssg.starroad.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class ReviewController {
     private final RestTemplate restTemplate;
 
     @PostMapping("/write")
-    public ResponseEntity<Review> addReview(@RequestBody ReviewRequest reviewRequest) {
+    public ResponseEntity<Review> addReview(@RequestBody ReviewRequestDTO reviewRequest) {
         Review createdReview = reviewService.createReview(reviewRequest.toEntity());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdReview);
     }

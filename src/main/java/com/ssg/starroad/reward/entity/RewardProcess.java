@@ -1,32 +1,23 @@
 package com.ssg.starroad.reward.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import com.ssg.starroad.common.entity.BaseTimeEntity;
-import com.ssg.starroad.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.Date;
-
-import static jakarta.persistence.GenerationType.IDENTITY;
-import static lombok.AccessLevel.PROTECTED;
+import java.time.LocalDate;
 
 @Getter
+@Setter
 @Entity
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor
 @Table(name = "REWARD_PROCESS")
 public class RewardProcess {
 
-//    @Id
-//    @OneToOne
-//    @JoinColumn(name = "ID", referencedColumnName = "ID")
-//    private User user;
 
     @Id
-    @Column(name = "USER_ID")
-    private int userId;
+    @Column(name = "USER_ID", nullable = false)
+    private Long userId;  // Primary key로 사용
 
     @Column(name = "REVIEW_COUNT", nullable = false)
     private int reviewCount = 0;
@@ -34,11 +25,17 @@ public class RewardProcess {
     @Column(name = "COUPON_COUNT", nullable = false)
     private int couponCount = 0;
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "EXPIRED_AT", nullable = false)
-    private Date expiredAt;
+    private LocalDate expiredAt = LocalDate.now().plusDays(7);
 
     @Column(name = "REWARD_STATUS", nullable = false)
     private boolean rewardStatus = false;
+    @Column(name = "USAGE_STATUS", nullable = false)
+    private boolean usageStatus = false;
+    @Column(name = "ISSUE_STATUS", nullable = false)
+    private boolean issueStatus = false;
 
+    public RewardProcess(Long userId) {
+        this.userId = userId;
+    }
 }

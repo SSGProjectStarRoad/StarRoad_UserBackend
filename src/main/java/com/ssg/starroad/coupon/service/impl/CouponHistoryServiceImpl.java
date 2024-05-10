@@ -1,11 +1,13 @@
 package com.ssg.starroad.coupon.service.impl;
 
-import com.ssg.starroad.coupon.dto.CouponDTO;
+import com.ssg.starroad.coupon.DTO.CouponDTO;
 import com.ssg.starroad.coupon.entity.CouponHistory;
 import com.ssg.starroad.coupon.repository.CouponHistoryRepository;
 import com.ssg.starroad.coupon.repository.CouponRepository;
 import com.ssg.starroad.coupon.repository.impl.CouponHistoryRepositoryCustom;
 import com.ssg.starroad.coupon.service.CouponHistoryService;
+import com.ssg.starroad.reward.entity.RewardProcess;
+import com.ssg.starroad.reward.repository.RewardProcessRepository;
 import com.ssg.starroad.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -23,6 +25,7 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
     private final CouponRepository couponRepository;
     private final CouponHistoryRepository couponHistoryRepository;
     private final CouponHistoryRepositoryCustom couponHistoryRepositoryCustom;
+    private final RewardProcessRepository rewardProcessRepository;
 
     @Override
     public void CouponUserAdd(Long userID, Long couponID) {
@@ -30,6 +33,11 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
                 new CouponHistory(null, userRepository.findById(userID).orElseThrow(),
                         couponID,false, LocalDate.now().plusDays(7));
         couponHistoryRepository.save(couponHistory);
+
+        RewardProcess rewardProcess =rewardProcessRepository.findById(userID).orElseThrow();
+        rewardProcess.setIssueStatus(true);
+        rewardProcessRepository.save(rewardProcess);
+
     }
 
     @Override
@@ -38,13 +46,18 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
     }
 
     @Override
-    public boolean CouponUsageModify(Long couponID, boolean couponUsageStatus) {
+    public boolean CouponUsageModify(Long couponHistoryId) {
 
         // 쿠폰 조회
-        Optional<CouponHistory> optionalCouponHistory = couponHistoryRepositoryCustom.findByCouponId(couponID);
-        if (optionalCouponHistory.isPresent() && !couponUsageStatus) {
+        Optional<CouponHistory> optionalCouponHistory = couponHistoryRepository.findById(couponHistoryId);
+        if (optionalCouponHistory.isPresent()) {
             CouponHistory couponHistory = optionalCouponHistory.get();
             couponHistory.useCoupon(); // 상태를 true로 변경
+            Long userid = couponHistory.getUser().getId();
+            RewardProcess rewardProcess = rewardProcessRepository.findById(userid).orElseThrow();
+            rewardProcess.setUsageStatus(true);
+            rewardProcess.setCouponCount(rewardProcess.getCouponCount()+1);
+            rewardProcessRepository.save(rewardProcess);
             couponHistoryRepository.save(couponHistory); // 변경 사항 저장
             return true; // 성공적으로 업데이트 되었다면 true 반환
         }
@@ -53,7 +66,6 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
 
     @Override
     public List<CouponDTO> CouponsUserList(Long userID) {
-        return couponHistoryRepositoryCustom.findCouponsByUserId(userID).stream()
-                .map(coupon -> modelMapper.map(coupon, CouponDTO.class)).toList();
+        return couponHistoryRepositoryCustom.findCouponsByUserId(userID);
     }
 }

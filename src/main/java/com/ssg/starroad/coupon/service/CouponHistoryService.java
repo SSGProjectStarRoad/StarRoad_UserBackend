@@ -1,7 +1,6 @@
 package com.ssg.starroad.coupon.service;
 
-import com.ssg.starroad.coupon.dto.CouponDTO;
-import com.ssg.starroad.coupon.entity.Coupon;
+import com.ssg.starroad.coupon.DTO.CouponDTO;
 
 import java.util.List;
 
@@ -16,7 +15,7 @@ public interface CouponHistoryService {
 
 
 
-    boolean CouponUsageModify(Long couponID, boolean couponUsageStatus);
+    boolean CouponUsageModify(Long couponID);
 
 
 

@@ -1,4 +1,4 @@
-package com.ssg.starroad.review.dto;
+package com.ssg.starroad.review.DTO;
 
 import com.ssg.starroad.review.entity.Review;
 import com.ssg.starroad.shop.entity.Store;

@@ -1,6 +1,6 @@
 package com.ssg.starroad.review.controller;
 
-import com.ssg.starroad.review.dto.ReviewRequestDTO;
+import com.ssg.starroad.review.DTO.ReviewRequestDTO;
 import com.ssg.starroad.review.entity.Review;
 import com.ssg.starroad.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;

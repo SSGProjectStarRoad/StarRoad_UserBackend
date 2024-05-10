@@ -14,6 +14,7 @@ import java.time.LocalDate;
 @Table(name = "REWARD_PROCESS")
 public class RewardProcess {
 
+
     @Id
     @Column(name = "USER_ID", nullable = false)
     private Long userId;  // Primary key로 사용

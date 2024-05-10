@@ -14,6 +14,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @Entity
 @NoArgsConstructor(access = PROTECTED)
+@Embeddable
 public class ReviewImage extends BaseTimeEntity {
 
     @Id

@@ -14,6 +14,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @Entity
 @NoArgsConstructor(access = PROTECTED)
+@Embeddable
 public class Review extends BaseTimeEntity {
 
     @Id
@@ -26,15 +27,15 @@ public class Review extends BaseTimeEntity {
 
     @ManyToOne
     @JoinColumn(name = "store_id")
-    private Store store;
+    private Store store; // 스토어 이름
 
-    private boolean visible;
+    private boolean visible; // 삭제여부
 
-    private Long likeCount;
+    private Long likeCount; // 좋아요 수
 
     private String paymentNum;
 
-    private String contents;
+    private String contents; // 리뷰 내용
 
     private String summary;
 

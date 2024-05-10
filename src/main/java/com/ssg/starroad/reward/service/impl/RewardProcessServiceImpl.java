@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -46,7 +47,7 @@ public class RewardProcessServiceImpl implements RewardProcessService {
     public void updateReviewCount(Long userId) {
         RewardProcess rewardProcess = rewardProcessRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user ID: " + userId));
-        rewardProcess.setCouponCount(rewardProcess.getReviewCount() + 1);
+        rewardProcess.setReviewCount(rewardProcess.getReviewCount() + 1);
         rewardProcessRepository.save(rewardProcess);
     }
 
@@ -60,10 +61,23 @@ public class RewardProcessServiceImpl implements RewardProcessService {
     }
 
     @Override
+    public void resetStatus(Long userId) {
+        RewardProcess rewardProcess = rewardProcessRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user ID: " + userId));
+        rewardProcess.setIssueStatus(false);
+        rewardProcess.setUsageStatus(false);
+        rewardProcessRepository.save(rewardProcess);
+    }
+
+    @Override
     @Transactional
     public RewardProcessDTO getProcess(Long userId){
         RewardProcess rewardProcess = rewardProcessRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user ID: " + userId));
+        if(Objects.equals(rewardProcess.getExpiredAt(), LocalDate.now()))
+        {
+           rewardProcessRepository.delete(rewardProcess);
+        }
         return modelMapper.map(rewardProcess,RewardProcessDTO.class);
     }
 

@@ -29,6 +29,10 @@ public class RewardProcess {
 
     @Column(name = "REWARD_STATUS", nullable = false)
     private boolean rewardStatus = false;
+    @Column(name = "USAGE_STATUS", nullable = false)
+    private boolean usageStatus = false;
+    @Column(name = "ISSUE_STATUS", nullable = false)
+    private boolean issueStatus = false;
 
     public RewardProcess(Long userId) {
         this.userId = userId;

@@ -1,10 +1,8 @@
 package com.ssg.starroad.coupon.controller;
 
-import com.ssg.starroad.coupon.dto.CouponDTO;
-import com.ssg.starroad.coupon.dto.CouponUsageDTO;
+import com.ssg.starroad.coupon.DTO.CouponDTO;
 import com.ssg.starroad.coupon.service.CouponHistoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

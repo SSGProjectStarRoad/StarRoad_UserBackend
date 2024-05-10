@@ -1,4 +1,4 @@
-package com.ssg.starroad.coupon.dto;
+package com.ssg.starroad.coupon.DTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

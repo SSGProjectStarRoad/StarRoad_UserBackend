@@ -16,4 +16,6 @@ public class RewardProcessDTO {
     private int couponCount;
     private boolean rewardStatus;
     private LocalDate expiredAt;
+    private boolean usageStatus;
+    private boolean issueStatus;
 }

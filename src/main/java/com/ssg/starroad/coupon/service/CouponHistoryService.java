@@ -1,7 +1,6 @@
 package com.ssg.starroad.coupon.service;
 
-import com.ssg.starroad.coupon.dto.CouponDTO;
-import com.ssg.starroad.coupon.entity.Coupon;
+import com.ssg.starroad.coupon.DTO.CouponDTO;
 
 import java.util.List;
 

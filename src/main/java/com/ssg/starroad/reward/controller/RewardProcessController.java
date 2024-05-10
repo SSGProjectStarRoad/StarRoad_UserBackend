@@ -51,6 +51,15 @@ public class RewardProcessController {
             return ResponseEntity.badRequest().body("Error updating status: " + e.getMessage());
         }
     }
+    @PatchMapping("/{userId}/new")
+    public ResponseEntity<?> resetStatus(@PathVariable Long userId) {
+        try {
+            rewardProcessService.resetStatus(userId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error updating status: " + e.getMessage());
+        }
+    }
 
     @GetMapping("/{userId}/get")
     public ResponseEntity<?> getProcess(@PathVariable("userId") Long userId){

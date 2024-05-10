@@ -1,10 +1,9 @@
 package com.ssg.starroad.coupon.repository.impl;
 
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.ssg.starroad.coupon.dto.CouponDTO;
+import com.ssg.starroad.coupon.DTO.CouponDTO;
 import com.ssg.starroad.coupon.entity.CouponHistory;
 import com.ssg.starroad.coupon.entity.QCoupon;
 import com.ssg.starroad.coupon.entity.QCouponHistory;

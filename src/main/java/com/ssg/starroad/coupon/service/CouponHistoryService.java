@@ -6,9 +6,19 @@ import com.ssg.starroad.coupon.entity.Coupon;
 import java.util.List;
 
 public interface CouponHistoryService {
-    public void issueCoupon(Long userID, Long couponID);
 
-    public CouponDTO getCouponById(Long couponID);
-    public boolean updateCouponUsage(Long couponID, boolean couponUsageStatus);
-    public List<CouponDTO> getCouponsByUserID(Long userID);
+
+    void CouponUserAdd(Long userID, Long couponID);
+
+
+
+    CouponDTO CouponDetails(Long couponID);
+
+
+
+    boolean CouponUsageModify(Long couponID, boolean couponUsageStatus);
+
+
+
+    List<CouponDTO> CouponsUserList(Long userID);
 }

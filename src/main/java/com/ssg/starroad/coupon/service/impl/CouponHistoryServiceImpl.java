@@ -1,10 +1,7 @@
 package com.ssg.starroad.coupon.service.impl;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.ssg.starroad.coupon.dto.CouponDTO;
-import com.ssg.starroad.coupon.entity.Coupon;
 import com.ssg.starroad.coupon.entity.CouponHistory;
-import com.ssg.starroad.coupon.entity.QCouponHistory;
 import com.ssg.starroad.coupon.repository.CouponHistoryRepository;
 import com.ssg.starroad.coupon.repository.CouponRepository;
 import com.ssg.starroad.coupon.repository.impl.CouponHistoryRepositoryCustom;
@@ -12,13 +9,11 @@ import com.ssg.starroad.coupon.service.CouponHistoryService;
 import com.ssg.starroad.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +25,7 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
     private final CouponHistoryRepositoryCustom couponHistoryRepositoryCustom;
 
     @Override
-    public void issueCoupon(Long userID, Long couponID) {
+    public void CouponUserAdd(Long userID, Long couponID) {
         CouponHistory couponHistory =
                 new CouponHistory(null, userRepository.findById(userID).orElseThrow(),
                         couponID,false, LocalDate.now().plusDays(7));
@@ -38,12 +33,12 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
     }
 
     @Override
-    public CouponDTO getCouponById(Long couponID) {
+    public CouponDTO CouponDetails(Long couponID) {
         return   modelMapper.map(couponRepository.findById(couponID),CouponDTO.class);
     }
 
     @Override
-    public boolean updateCouponUsage(Long couponID, boolean couponUsageStatus) {
+    public boolean CouponUsageModify(Long couponID, boolean couponUsageStatus) {
 
         // 쿠폰 조회
         Optional<CouponHistory> optionalCouponHistory = couponHistoryRepositoryCustom.findByCouponId(couponID);
@@ -57,7 +52,7 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
     }
 
     @Override
-    public List<CouponDTO> getCouponsByUserID(Long userID) {
+    public List<CouponDTO> CouponsUserList(Long userID) {
         return couponHistoryRepositoryCustom.findCouponsByUserId(userID).stream()
                 .map(coupon -> modelMapper.map(coupon, CouponDTO.class)).toList();
     }

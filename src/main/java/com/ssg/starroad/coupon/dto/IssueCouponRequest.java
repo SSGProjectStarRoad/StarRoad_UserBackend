@@ -1,7 +1,11 @@
 package com.ssg.starroad.coupon.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class IssueCouponRequest {
+    @JsonProperty("user_id")
     private Long userId;
+    @JsonProperty("coupon_id")
     private Long couponId;
 
     // Getters and Setters

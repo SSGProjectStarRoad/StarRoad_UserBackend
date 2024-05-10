@@ -25,18 +25,18 @@ public class CouponHistorySeviceTest {
 
     @Test
     public void testDetailCoupon(){
-        CouponDTO couponDTO =couponHistoryService.getCouponById(1L);
+        CouponDTO couponDTO =couponHistoryService.CouponDetails(1L);
         log.info("coupon detail :{}", couponDTO.toString());
     }
 
     @Test
     public void testupdateCouponUsage(){
-        couponHistoryService.updateCouponUsage(2L,false);
+        couponHistoryService.CouponUsageModify(2L,false);
         log.info("coupon status: {} ",couponHistoryRepository.findById(2L));
     }
     @Test
     public void testgetCouponsByUserID(){
-        log.info("user coupons:{}",couponHistoryService.getCouponsByUserID(4L));
+        log.info("user coupons:{}",couponHistoryService.CouponsUserList(4L));
     }
 
 }

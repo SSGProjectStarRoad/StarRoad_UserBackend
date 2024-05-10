@@ -1,4 +1,4 @@
-package com.ssg.starroad.review.dto;
+package com.ssg.starroad.review.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

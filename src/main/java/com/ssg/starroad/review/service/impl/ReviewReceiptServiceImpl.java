@@ -1,6 +1,6 @@
 package com.ssg.starroad.review.service.impl;
 
-import com.ssg.starroad.review.dto.ReviewReceiptDTO;
+import com.ssg.starroad.review.DTO.ReviewReceiptDTO;
 import com.ssg.starroad.review.entity.ReviewReceipt;
 import com.ssg.starroad.review.repository.ReviewReceiptRepository;
 import com.ssg.starroad.review.service.ReviewReceiptService;

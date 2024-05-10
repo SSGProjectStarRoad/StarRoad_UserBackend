@@ -1,6 +1,6 @@
 package com.ssg.starroad.review.controller;
 
-import com.ssg.starroad.review.dto.ReviewReceiptDTO;
+import com.ssg.starroad.review.DTO.ReviewReceiptDTO;
 import com.ssg.starroad.review.service.ReviewReceiptService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

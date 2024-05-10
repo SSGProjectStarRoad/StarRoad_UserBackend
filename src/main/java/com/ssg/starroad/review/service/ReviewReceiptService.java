@@ -1,7 +1,6 @@
 package com.ssg.starroad.review.service;
 
-import com.ssg.starroad.review.dto.ReviewReceiptDTO;
-import com.ssg.starroad.review.entity.ReviewReceipt;
+import com.ssg.starroad.review.DTO.ReviewReceiptDTO;
 
 import java.util.List;
 import java.util.Optional;

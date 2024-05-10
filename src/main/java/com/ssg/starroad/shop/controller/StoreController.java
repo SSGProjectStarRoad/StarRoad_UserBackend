@@ -22,7 +22,7 @@ public class StoreController {
 
 
     @GetMapping("/종합쇼핑몰 넘버 /~~/~~/~~")
-    public ResponseEntity<List<StoreDTO>>StoreList(){
+    public ResponseEntity<List<StoreDTO>>StoreSearch(){
 
         List<StoreDTO> storeDTOList =storeService.searchStoreList(1L);
         log.info(storeDTOList.toString());

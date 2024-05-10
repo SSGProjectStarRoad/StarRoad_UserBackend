@@ -1,5 +1,6 @@
 package com.ssg.starroad.review.entity;
 
+import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -12,6 +13,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @Entity
 @NoArgsConstructor(access = PROTECTED)
+@Embeddable
 public class ReviewSelection {
     @Id
     @GeneratedValue(strategy = IDENTITY)

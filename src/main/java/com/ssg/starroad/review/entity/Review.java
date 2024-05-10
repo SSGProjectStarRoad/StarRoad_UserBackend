@@ -5,7 +5,8 @@ import com.ssg.starroad.review.enums.ConfidenceType;
 import com.ssg.starroad.shop.entity.Store;
 import com.ssg.starroad.user.entity.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -16,6 +17,7 @@ import static lombok.AccessLevel.PROTECTED;
 @AllArgsConstructor
 @Builder
 @Setter
+@Embeddable
 public class Review extends BaseTimeEntity {
 
     @Id

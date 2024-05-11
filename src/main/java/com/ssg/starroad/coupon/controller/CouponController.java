@@ -1,11 +1,9 @@
 package com.ssg.starroad.coupon.controller;
 
-import com.ssg.starroad.coupon.dto.CouponDTO;
-import com.ssg.starroad.coupon.dto.IssueCouponRequest;
+import com.ssg.starroad.coupon.DTO.CouponDTO;
+import com.ssg.starroad.coupon.DTO.IssueCouponRequest;
 import com.ssg.starroad.coupon.service.CouponHistoryService;
-import com.ssg.starroad.coupon.service.CouponService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,12 +16,15 @@ public class CouponController {
 
     private final CouponHistoryService couponHistoryService;
 
-    @PostMapping("/{coupon_id}/issue")
+    @PostMapping("/issue")
     public ResponseEntity<String> issueCoupon(@RequestBody IssueCouponRequest request) {
-        // 로직 구현 부분, 예를 들어 쿠폰 발급 로직
+
+        if (request.getUserId() == null || request.getCouponId() == null) {
+            return ResponseEntity.badRequest().body("UserId or CouponId cannot be null");
+        }
+
         couponHistoryService.CouponUserAdd(request.getUserId(), request.getCouponId());
 
-        // 성공 응답 반환
         return ResponseEntity.ok("Coupon issued successfully to user ID " + request.getUserId());
     }
     @GetMapping("/{userId}/coupon/list")

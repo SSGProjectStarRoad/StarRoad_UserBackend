@@ -31,7 +31,6 @@ public class RewardHistoryServiceImpl implements RewardHistoryService {
         user.ifPresent(value -> rewardHistoryRepository.save(RewardHistory.builder()
                 .rewardId(rewardmemberDTO.getRewardId())
                 .user(value).build()));
-
     }
 
     @Override

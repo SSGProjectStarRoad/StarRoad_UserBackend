@@ -16,10 +16,13 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -32,7 +35,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor
-public class User extends BaseTimeEntity implements UserDetails {
+public class User extends BaseTimeEntity implements UserDetails, OAuth2User {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -41,8 +44,8 @@ public class User extends BaseTimeEntity implements UserDetails {
     // 데이터베이스에서 식별자로 사용되는 id 값의 안정성을 보장
     private Long id;
 
-    @Size(min = 8, max = 15, message = "비밀번호는 8자 이상 15자 이하여야 합니다.")
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W).{8,}$",
+            message = "비밀번호는 8자 이상이며, 숫자, 문자, 특수문자를 각각 하나 이상 포함해야 합니다.")
     private String password; // bcrypt
 
     @Size(min = 2, max = 10, message = "이름은 2자 이상 10자 이하여야 합니다.")
@@ -69,6 +72,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Email(message = "유효한 이메일 주소여야 합니다.")
     private String email;
 
+    @Enumerated(EnumType.STRING)
     private ProviderType providerType; // 네이버, 카카오, 구글
     private String providerId; // (네이버, 카카오, 구글)에서 받아온 아이디
 
@@ -79,6 +83,45 @@ public class User extends BaseTimeEntity implements UserDetails {
     private ActiveStatus activeStatus;
 
 
+    // OAuth2User 메소드
+
+    @Override
+    public String getName() {
+        return this.providerId; // providerId를 반환
+    }
+
+    // 제네릭 타입 A를 사용하여, OAuth2User 인터페이스에서
+    // 다양한 타입의 사용자 속성을 안전하게 가져오도록 설계(필수)
+    // String email = user.getAttribute("email")과 같이 사용할 때
+    // 컴파일러가 반환 타입이 String임을 확인하고, 다른 타입으로 잘못 캐스팅하는 실수를 방지
+    // 또 name 파라미터는 OAuth2User의 속성 중 하나를 지정하는 문자열
+    // email, name, nickname 등과 같이 실제 속성 이름을 문자열로 전달받아 해당 속성 값을 반환
+    @Override
+    public <A> A getAttribute(String name) {
+        switch (name) {
+            case "email": return (A) this.email;
+            case "name": return (A) this.name;
+            case "nickname": return (A) this.nickname;
+            case "imagePath": return (A) this.imagePath;
+            default: return null;  // 해당하는 속성이 없을 경우 null 반환
+        }
+    }
+
+    // 메소드는 속성 맵 전체를 반환
+    @Override
+    public Map<String, Object> getAttributes() {
+        // 실제 사용 시 필요한 모든 속성을 포함한 Map을 반환
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("email", this.email);
+        attributes.put("name", this.name);
+        attributes.put("nickname", this.nickname);
+        attributes.put("imagePath", this.imagePath);
+        attributes.put("providerType", this.providerType != null ? this.providerType.name() : null);
+        attributes.put("providerId", this.providerId);
+        return attributes;
+    }
+
+    // UserDetails 메소드
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // 모든 사용자에게 'ROLE_USER' 권한 부여

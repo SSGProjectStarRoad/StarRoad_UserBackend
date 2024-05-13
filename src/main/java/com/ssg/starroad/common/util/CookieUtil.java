@@ -19,6 +19,7 @@ public class CookieUtil {
         cookie.setMaxAge(maxAge); // 쿠키의 생명 주기 제어
         response.addCookie(cookie); // 응답에 쿠키를 추가하여 클라이언트에게 전송
     }
+    // HTTPOnly와 Secure 플래그를 가지게 설정하여 XSS와 데이터 중간자 공격을 방지
 
     // 지정된 이름의 쿠키를 삭제
     public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String name) {

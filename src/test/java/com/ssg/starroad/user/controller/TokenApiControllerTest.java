@@ -6,6 +6,9 @@ import com.ssg.starroad.config.jwt.JwtProperties;
 import com.ssg.starroad.user.dto.CreateAccessTokenRequest;
 import com.ssg.starroad.user.entity.RefreshToken;
 import com.ssg.starroad.user.entity.User;
+import com.ssg.starroad.user.enums.ActiveStatus;
+import com.ssg.starroad.user.enums.Gender;
+import com.ssg.starroad.user.enums.ProviderType;
 import com.ssg.starroad.user.repository.RefreshTokenRepository;
 import com.ssg.starroad.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +24,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -67,10 +71,21 @@ class TokenApiControllerTest {
         // given
         final String url = "/api/token/access-token";
 
-        // 테스트용 사용자를 생성하고 데이터베이스에 저장합
+        // 테스트용 사용자를 생성하고 데이터베이스에 저장
         User testUser = userRepository.save(User.builder()
                 .email("user@example.com")
-                .password("Valid123$")
+                .password("Valid123$") // 비밀번호는 유효성 규칙에 맞춰 생성
+                .name("John Doe")
+                .nickname("JD2024") // 닉네임은 유니크해야 함, 데이터베이스 상황에 따라 수정 필요
+                .gender(Gender.MALE) // 성별은 ENUM 값 중 하나
+                .birth(LocalDate.of(1990, 1, 1)) // LocalDate 객체로 생년월일 설정
+                .phone("01012345678") // 하이픈 없는 전화번호
+                .providerType(ProviderType.GOOGLE) // 인증 제공자 유형
+                .providerId("123456") // 제공자 ID
+                .imagePath("/path/to/image.jpg") // 이미지 경로
+                .reviewExp(0) // 리뷰 경험치
+                .point(0) // 포인트
+                .activeStatus(ActiveStatus.ACTIVE) // 활성 상태
                 .build());
 
         // 테스트 사용자의 ID를 사용하여 리프레시 토큰을 생성

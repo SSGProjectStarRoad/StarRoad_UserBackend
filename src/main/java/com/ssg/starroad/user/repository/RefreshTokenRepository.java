@@ -2,6 +2,7 @@ package com.ssg.starroad.user.repository;
 
 import com.ssg.starroad.user.entity.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -9,6 +10,9 @@ import java.util.Optional;
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
     Optional<RefreshToken> findByUser_Id(Long userId);
     Optional<RefreshToken> findByToken(String refreshToken);
+
+    @Transactional
+    void deleteByUserId(Long userId);
 }
 
 // findByUser_Id(Long userId) 메서드를 사용하는 것은

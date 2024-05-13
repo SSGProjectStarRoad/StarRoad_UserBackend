@@ -6,7 +6,7 @@ import com.ssg.starroad.user.dto.LoginResponse;
 import com.ssg.starroad.user.entity.User;
 import com.ssg.starroad.user.service.RefreshTokenService;
 import com.ssg.starroad.user.service.UserService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,14 +36,21 @@ public class UserController {
         boolean isValidUser = userService.validateUser(request.getEmail(), request.getPassword());
         if (isValidUser) {
             UserDetails userDetails = userService.loadUserByUsername(request.getEmail());
-            User user = (User) userDetails; // UserDetails를 User로 캐스팅
+            User user = userService.findByEmail(userDetails.getUsername()).orElse(null);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
 
-            // 토큰 만료 시간 설정: 현재 시간으로부터 10분 후
-            Date expiry = new Date(System.currentTimeMillis() + 600 * 1000); // 600 seconds (10 minutes)
+            Date expiry = new Date(System.currentTimeMillis() + 600 * 1000); // 10 minutes
+            String accessToken = tokenProvider.createToken(expiry, user);
+            String refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
-            String accessToken = tokenProvider.createToken(expiry, user); // 만료 시간을 인자로 추가
-            String refreshToken = refreshTokenService.createRefreshToken(user.getId()); // 리프레시 토큰 생성 로직
-            return ResponseEntity.ok(new LoginResponse(accessToken, refreshToken));
+            // 설정된 헤더를 응답에 추가
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", "Bearer " + accessToken); // Bearer 타입의 Authorization 헤더 추가
+
+            LoginResponse loginResponse = new LoginResponse(accessToken, refreshToken);
+            return ResponseEntity.ok().headers(headers).body(loginResponse);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }

@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -19,22 +19,21 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Optional<User> userOptional = userRepository.findByEmail(email);
         User user = userOptional.orElseThrow(() ->
-                new UsernameNotFoundException("해당 이메일을 가진 사용자를 찾을 수 없습니다: " + email));
+                new UsernameNotFoundException("User not found with email: " + email));
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))); // 권한 설정
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
     }
     // Collections.singletonList 단일 항목을 포함하는 변경 불가능한 리스트 생성. 단일 권한 처리
 
-    // 리프레시 토큰을 이용해 새로운 액세스 토큰을 생성할 때 해당 사용자의 정보를 db에서 조회하려고
+    // 리프레시 토큰을 이용해 새로운 액세스 토큰을 생성할 때 해당 사용자의 정보를 db에서 조회하기 위해
     // User 클래스에서 id 필드에 해당하며, @Id 어노테이션으로 지정
     @Override
     public User findById(Long userId) {
@@ -42,18 +41,21 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
     }
 
+    // OAuth2에서 제공하는 이메일은 유일 값이므로 이 메서드를 사용해 유저 찾기 가능
     @Override
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
 
     @Override
     public Long save(UserDTO userDTO) {
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
         User user = User.builder()
                 .email(userDTO.getEmail())
-                .password(passwordEncoder.encode(userDTO.getPassword()))
+                .password(encoder.encode(userDTO.getPassword()))
                 .name(userDTO.getName())
                 .nickname(userDTO.getNickname())
                 .imagePath(userDTO.getImagePath())
@@ -69,12 +71,21 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user).getId();
     }
     public boolean validateUser(String email, String password) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            return passwordEncoder.matches(password, user.getPassword()) && user.isEnabled();
-        }
-        return false;
-    }
 
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (!userOpt.isPresent()) {
+            System.out.println("No user found with email: " + email);
+            return false;
+        }
+
+        User user = userOpt.get();
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        boolean passwordMatches = encoder.matches(password, user.getPassword());
+
+        if (!passwordMatches) {
+            System.out.println("Password mismatch for user: " + email);
+        }
+
+        return passwordMatches;
+    }
 }

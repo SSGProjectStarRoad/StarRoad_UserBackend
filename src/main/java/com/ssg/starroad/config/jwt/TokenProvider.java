@@ -30,7 +30,7 @@ public class TokenProvider {
     }
     // 사용자 객체와 만료 시간(Duration)을 받아 jwt 토큰 생성
     // 파라미터 (사용자 정보, 토큰 유효 기간)
-    // 현재 시간을 구하고 expiredAt으로 전달된 기간을 현재 시간에 더해 토큰 만료 시간expiry 계산
+    // 현재 시간을 구하고 expiredAt으로 전달된 기간을 현재 시간에 더해 토큰 만료 시간 expiry 계산
     // creatToken 메소드 호출 실제 토큰 생성
 
 

@@ -41,7 +41,7 @@ public class CouponHistoryRepositoryCustom {
                         qCoupon.discountAmount.as("couponDiscountAmount"),
                         qCoupon.status.as("couponStatus"),
                         qCouponHistory.usageStatus.as("couponUsageStatus"),
-                        qCoupon.expiredAt.as("couponExpiredAt"),
+                        qCouponHistory.expiredAt.as("couponExpiredAt"),
                         qCoupon.shopType.as("couponShopType"),
                         qCoupon.minAmount.as("couponMinAmount"),
                         qCoupon.maxAmount.as("couponMaxAmount")))

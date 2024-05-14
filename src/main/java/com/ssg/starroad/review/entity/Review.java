@@ -56,12 +56,15 @@ public class Review extends BaseTimeEntity {
     }
 
     public void updateLikeCount(Long like) {
-        if (like < 0) {
-            this.likeCount = 0L;
-            return;
+        if (likeCount == null) {
+            likeCount = 0L; // null 값을 0으로 처리
         }
-
-        this.likeCount = like;
+        else if (like < 0) {
+            this.likeCount = 0L;
+        }
+        else {
+            this.likeCount = like;
+        }
     }
 
 }

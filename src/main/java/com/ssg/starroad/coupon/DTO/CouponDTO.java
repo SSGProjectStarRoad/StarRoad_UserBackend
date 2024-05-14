@@ -1,4 +1,4 @@
-package com.ssg.starroad.coupon.dto;
+package com.ssg.starroad.coupon.DTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -11,8 +11,12 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CouponDTO {
+
+    @JsonProperty("coupon_history_id")
+    private Long couponHistoryId;
+
     @JsonProperty("coupon_id")
-    private int couponId;
+    private Long couponId;
 
     @JsonProperty("coupon_name")
     private String couponName;

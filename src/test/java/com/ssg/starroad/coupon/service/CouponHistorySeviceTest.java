@@ -1,6 +1,6 @@
 package com.ssg.starroad.coupon.service;
 
-import com.ssg.starroad.coupon.dto.CouponDTO;
+import com.ssg.starroad.coupon.DTO.CouponDTO;
 import com.ssg.starroad.coupon.repository.CouponHistoryRepository;
 import com.ssg.starroad.coupon.repository.CouponRepository;
 import com.ssg.starroad.coupon.repository.CouponRepositoryTest;
@@ -31,7 +31,7 @@ public class CouponHistorySeviceTest {
 
     @Test
     public void testupdateCouponUsage(){
-        couponHistoryService.CouponUsageModify(2L,false);
+        couponHistoryService.CouponUsageModify(2L);
         log.info("coupon status: {} ",couponHistoryRepository.findById(2L));
     }
     @Test

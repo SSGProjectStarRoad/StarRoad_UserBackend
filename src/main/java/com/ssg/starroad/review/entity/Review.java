@@ -5,8 +5,7 @@ import com.ssg.starroad.review.enums.ConfidenceType;
 import com.ssg.starroad.shop.entity.Store;
 import com.ssg.starroad.user.entity.User;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -14,7 +13,9 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @Entity
 @NoArgsConstructor(access = PROTECTED)
-@Embeddable
+@AllArgsConstructor
+@Builder
+@Setter
 public class Review extends BaseTimeEntity {
 
     @Id
@@ -27,18 +28,43 @@ public class Review extends BaseTimeEntity {
 
     @ManyToOne
     @JoinColumn(name = "store_id")
-    private Store store; // 스토어 이름
+    private Store store;
 
-    private boolean visible; // 삭제여부
+    private boolean visible;
 
-    private Long likeCount; // 좋아요 수
+    private Long likeCount;
 
     private String paymentNum;
 
-    private String contents; // 리뷰 내용
+    private String contents;
 
     private String summary;
 
     @Enumerated(EnumType.STRING)
     private ConfidenceType confidence;
+
+    public void updateContents(String contents) {
+        this.contents = contents;
+    }
+
+    public void updateSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public void updateVisibility(boolean visible) {
+        this.visible = visible;
+    }
+
+    public void updateLikeCount(Long like) {
+        if (likeCount == null) {
+            likeCount = 0L; // null 값을 0으로 처리
+        }
+        else if (like < 0) {
+            this.likeCount = 0L;
+        }
+        else {
+            this.likeCount = like;
+        }
+    }
+
 }

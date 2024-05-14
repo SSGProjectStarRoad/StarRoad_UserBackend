@@ -38,4 +38,12 @@ public class ReviewImageDTO {
                 .imagePath(entity.getImagePath())
                 .build();
     }
+
+    public static ReviewImageDTO fromEntity(ReviewImage reviewImage) {
+        return ReviewImageDTO.builder()
+                .id(reviewImage.getId())
+                .reviewId(reviewImage.getReview().getId())
+                .imagePath(reviewImage.getImagePath())
+                .build();
+    }
 }

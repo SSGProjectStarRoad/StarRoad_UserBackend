@@ -43,7 +43,7 @@ public class CouponRepositoryTest {
     @Test
     public void testSaveCoupon() {
         // 쿠폰 엔티티 생성
-        Coupon coupon = new Coupon(null,"Complex2", "Food", "Summer Sale", 1000, 10, 5000, 10000, "Active", LocalDate.now().plusDays(7));
+        Coupon coupon = new Coupon(null, "Complex2", "Food", "Summer Sale", 1000, 10, 5000, 10000, "Active", LocalDate.now().plusDays(7));
 
         // 쿠폰 저장
         Coupon savedCoupon = couponRepository.save(coupon);
@@ -58,13 +58,13 @@ public class CouponRepositoryTest {
 
     @Test
     public void testIssueCoupon() {
-        couponHistoryService.CouponUserAdd(4L,3L);
+        couponHistoryService.CouponUserAdd(4L, 3L);
 //        log.info("check issue coupon: {}", couponHistoryRepository.findById(1L));
     }
-
-    @Test
-    public void testfindByUserId(){
-//        Long userId = 1L;
+}
+//    @Test
+//    public void testfindByUserId(){
+////        Long userId = 1L;
 //        Iterable<Tuple> Coupons = couponHistoryRepositoryCustom.findCouponsByUserId(userId);
 
 //        // couponHistories를 반복하여 각 객체의 정보를 로그에 출력
@@ -95,4 +95,3 @@ public class CouponRepositoryTest {
 //        User savedUser = userRepository.save(user);
 //        log.info("Saved User: {}", savedUser);
 //    }
-}

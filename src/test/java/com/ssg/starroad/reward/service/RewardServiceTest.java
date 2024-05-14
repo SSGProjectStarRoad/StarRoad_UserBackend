@@ -2,9 +2,11 @@ package com.ssg.starroad.reward.service;
 
 
 import com.ssg.starroad.coupon.repository.CouponRepositoryTest;
+import com.ssg.starroad.review.service.ReviewImageService;
 import com.ssg.starroad.reward.DTO.RewardHistoryDTO;
 import com.ssg.starroad.reward.DTO.RewardMemberDTO;
 import com.ssg.starroad.reward.repository.RewardRepository;
+import jdk.swing.interop.SwingInterOpUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
@@ -21,7 +23,14 @@ public class RewardServiceTest {
 
     @Autowired
     private RewardHistoryService rewardHistoryService;
+    @Autowired
+    private ReviewImageService reviewImageService;
 
+    @Test
+    public void test() {
+        System.out.println("@@@@@@@");
+        log.info(reviewImageService.getReviewImages(1L).toString());
+    }
     @Test
     public void testRewardList(){
         log.info(rewardService.getRewardList());

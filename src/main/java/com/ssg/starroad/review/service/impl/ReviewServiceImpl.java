@@ -3,6 +3,7 @@ package com.ssg.starroad.review.service.impl;
 import com.ssg.starroad.review.entity.Review;
 import com.ssg.starroad.review.repository.ReviewRepository;
 import com.ssg.starroad.review.service.ReviewService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,13 +12,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
 
-    @Autowired
-    public ReviewServiceImpl(ReviewRepository reviewRepository) {
-        this.reviewRepository = reviewRepository;
+    @Override
+    public Long countReviewsByUserId(Long userId) {
+        return    reviewRepository.countByUserId(userId);
     }
 
     @Override

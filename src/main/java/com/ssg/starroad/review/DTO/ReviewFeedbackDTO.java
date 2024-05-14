@@ -14,8 +14,7 @@ import java.util.List;
 @Data
 public class ReviewFeedbackDTO {
 
-    @Embedded
-    private List<Review> reviews;
+
     private Long id;
     private String reviewFeedbackSelection;
     private Long reviewId;

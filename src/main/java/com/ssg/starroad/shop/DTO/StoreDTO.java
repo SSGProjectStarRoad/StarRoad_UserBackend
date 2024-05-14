@@ -5,6 +5,7 @@ import com.ssg.starroad.review.entity.Review;
 import com.ssg.starroad.review.entity.ReviewImage;
 import com.ssg.starroad.review.entity.ReviewSelection;
 import com.ssg.starroad.shop.entity.Store;
+import com.ssg.starroad.shop.enums.Floor;
 import jakarta.persistence.Embedded;
 import lombok.*;
 
@@ -17,9 +18,9 @@ public class StoreDTO {
 
     private String name;
 
-    private int floor;
-
-
+    private String floor;
+    private String contents;
+    private Long id;
     private String storeGuideMap;
 
 
@@ -32,8 +33,10 @@ public class StoreDTO {
 
     public static StoreDTO toDTO(Store entity) {
         return StoreDTO.builder()
+                .contents(entity.getContents())
+                .id(entity.getId())
                 .name(entity.getName())
-                .floor(entity.getFloor())
+                .floor(entity.getFloor().getFloor())
                 .storeGuideMap(entity.getStoreGuideMap())
                 .contactNumber(entity.getContactNumber())
                 .imagePath(entity.getImagePath())

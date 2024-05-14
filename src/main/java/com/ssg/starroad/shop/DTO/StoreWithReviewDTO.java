@@ -5,6 +5,7 @@ import com.ssg.starroad.review.entity.Review;
 import com.ssg.starroad.review.entity.ReviewImage;
 import com.ssg.starroad.review.entity.ReviewSelection;
 import com.ssg.starroad.shop.entity.Store;
+import com.ssg.starroad.shop.enums.Floor;
 import jakarta.persistence.Embedded;
 import lombok.*;
 
@@ -20,12 +21,12 @@ public class StoreWithReviewDTO {
     private List<ReviewDTO> reviews;
 
     private Long id;
-
+    private String contents;
     private String name;
 
-    private int floor;
+    private String floor;
 
-
+    private String operatingTime;
     private String storeGuideMap;
 
 

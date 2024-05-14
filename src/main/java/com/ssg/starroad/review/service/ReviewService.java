@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReviewService {
+    Long countReviewsByUserId(Long userId);
+  
     Review createReview(Review review);
 
     Optional<Review> getReviewById(Long id);

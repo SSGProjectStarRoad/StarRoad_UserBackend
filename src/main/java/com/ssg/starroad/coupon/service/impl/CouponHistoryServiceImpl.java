@@ -14,8 +14,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -66,6 +68,21 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
 
     @Override
     public List<CouponDTO> CouponsUserList(Long userID) {
-        return couponHistoryRepositoryCustom.findCouponsByUserId(userID);
+        List<CouponDTO> coupons = couponHistoryRepositoryCustom.findCouponsByUserId(userID);
+        LocalDate today = LocalDate.now();
+
+        coupons.forEach(coupon -> {
+            if (coupon.getCouponExpiredAt().isBefore(today)) {
+                coupon.setCouponUsageStatus(true);
+                CouponHistory couponHistory=couponHistoryRepository.findById(coupon.getCouponHistoryId()).orElseThrow();
+               couponHistory.setUsageStatus(true);
+                couponHistoryRepository.save(couponHistory);  // 변경된 쿠폰 상태 저장
+            }
+        });
+
+        return coupons.stream()
+                .sorted(Comparator.comparing(CouponDTO::isCouponUsageStatus)
+                        .thenComparing(CouponDTO::getCouponExpiredAt, Comparator.reverseOrder())) // 날짜가 최신순으로 정렬
+                .collect(Collectors.toList());
     }
 }

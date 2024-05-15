@@ -3,10 +3,7 @@ package com.ssg.starroad.coupon.entity;
 import com.ssg.starroad.common.entity.BaseTimeEntity;
 import com.ssg.starroad.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -15,6 +12,7 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Getter
 @Entity
+@Setter
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor
 @ToString

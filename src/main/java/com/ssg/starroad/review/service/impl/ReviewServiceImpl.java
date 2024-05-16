@@ -3,23 +3,30 @@ package com.ssg.starroad.review.service.impl;
 import com.ssg.starroad.review.entity.Review;
 import com.ssg.starroad.review.repository.ReviewRepository;
 import com.ssg.starroad.review.service.ReviewService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.*;
 
 @Service
-@RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final RestTemplate restTemplate;
 
-    @Override
-    public Long countReviewsByUserId(Long userId) {
-        return    reviewRepository.countByUserId(userId);
+
+    @Autowired
+    public ReviewServiceImpl(ReviewRepository reviewRepository, RestTemplate restTemplate) {
+        this.reviewRepository = reviewRepository;
+        this.restTemplate = restTemplate;
     }
 
     @Override
@@ -62,5 +69,45 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("Review with id " + id + " not found"));
         reviewRepository.delete(review);
+    }
+
+    // OCR API를 호출하는 메서드 예시
+    public ResponseEntity<String> callOcrApi(MultipartFile imageFile) throws IOException {
+        // OCR API 엔드포인트
+        String ocrApiUrl = "https://okn5z02skx.apigw.ntruss.com/custom/v1/30710/25e9f4b0de75101a14c45b2b4db7fc4ef23991aaabb3f2d5c40c7478127278f9/general";
+
+        // OCR API에 요청을 보낼 때 필요한 headers 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("X-OCR-SECRET", "aGtIcnlRZHZBRFF1cUNrUFFEWHpEWkRqUWVjTExndXk=");
+
+        // 이미지 파일을 Base64 인코딩
+        String base64Image = Base64.getEncoder().encodeToString(imageFile.getBytes());
+
+        // 요청 바디 생성
+        Map<String, Object> imageMap = new HashMap<>();
+        imageMap.put("format", "png");
+        imageMap.put("name", "medium");
+        imageMap.put("data", base64Image);
+        imageMap.put("url", null); // null 값을 허용하는 HashMap 사용
+
+        List<Map<String, Object>> images = new ArrayList<>();
+        images.add(imageMap);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("images", images);
+        body.put("lang", "ko");
+        body.put("requestId", "string");
+        body.put("resultType", "string");
+        body.put("timestamp", System.currentTimeMillis());
+        body.put("version", "V1");
+
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+
+        // OCR API에 POST 요청 보내기
+        ResponseEntity<String> response = restTemplate.postForEntity(ocrApiUrl, entity, String.class);
+        System.out.println("callOcrApi : " + response);
+        return response;
     }
 }

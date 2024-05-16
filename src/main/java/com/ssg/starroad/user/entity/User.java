@@ -44,4 +44,8 @@ public class User extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private ActiveStatus activeStatus;
+
+    public void setProfileimgPath(String path){
+        this.imagePath=path;
+    }
 }

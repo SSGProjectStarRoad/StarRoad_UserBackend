@@ -22,6 +22,10 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final RestTemplate restTemplate;
 
+    @Override
+    public Long countReviewsByUserId(Long userId) {
+        return    reviewRepository.countByUserId(userId);
+    }
 
     @Autowired
     public ReviewServiceImpl(ReviewRepository reviewRepository, RestTemplate restTemplate) {

@@ -32,7 +32,44 @@ public class S3Uploader {
      * @param multipartFile
      * @param dirName
      */
-    public String upload(MultipartFile[] multipartFile, String dirName) {
+    public String upload(MultipartFile multipartFile, String dirName) {
+        // 파일명과 확장자 분리
+        String originalFileName = multipartFile.getOriginalFilename();
+        int lastIndex = originalFileName.lastIndexOf('.');
+        String fileName = originalFileName.substring(0, lastIndex);
+        String extension = originalFileName.substring(lastIndex + 1);
+
+        // 파일명 URL 인코딩
+        String encodedFileName = null;
+        encodedFileName = Base64.getUrlEncoder().encodeToString(fileName.getBytes(StandardCharsets.UTF_8));
+
+        // S3에 저장될 파일명 구성
+        String s3FileName = dirName + "/" + UUID.randomUUID() + "_" + encodedFileName + "." + extension;
+
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        try {
+            objectMetadata.setContentLength(multipartFile.getInputStream().available());
+            objectMetadata.setContentType(multipartFile.getContentType());
+            // 권한 공개
+            objectMetadata.setHeader("x-amz-acl", "public-read");
+
+            amazonS3.putObject(bucket, s3FileName, multipartFile.getInputStream(), objectMetadata);
+        } catch (IOException e) {
+            log.error("S3 upload fail : " + fileName, e);
+            return String.format("S3 upload fail: %s", multipartFile.getOriginalFilename());
+        }
+
+        return amazonS3.getUrl(bucket, s3FileName).toString();
+    }
+
+    /**
+     * S3에 파일 여러개 업로드
+     * 파일명을 인코딩 하여 UUID로 변경하여 업로드
+     *
+     * @param multipartFile
+     * @param dirName
+     */
+    public List<String> upload(MultipartFile[] multipartFile, String dirName) {
         List<String> urlList = new ArrayList<>();
         for (MultipartFile file : multipartFile) {
             // 파일명과 확장자 분리
@@ -64,7 +101,7 @@ public class S3Uploader {
             urlList.add(amazonS3.getUrl(bucket, s3FileName).toString());
         }
 
-        return urlList.toString();
+        return urlList;
     }
 
     public void delete(String fileName) {

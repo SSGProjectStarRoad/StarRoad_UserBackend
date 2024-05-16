@@ -51,6 +51,9 @@ dependencies {
 	implementation 'com.amazonaws:aws-java-sdk-s3'
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
+	// JSON
+	implementation 'org.json:json:20231013'
+
 	// TEST IMPLEMENTATION ========================
 	// TEST DATABASE H2
 	testImplementation 'com.h2database:h2'

@@ -16,6 +16,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
+@ToString
 public class ReviewReceipt {
     @Id
     @GeneratedValue(strategy = IDENTITY)

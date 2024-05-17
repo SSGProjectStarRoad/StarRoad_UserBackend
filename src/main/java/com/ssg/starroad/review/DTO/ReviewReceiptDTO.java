@@ -1,10 +1,7 @@
 package com.ssg.starroad.review.DTO;
 
 import com.ssg.starroad.review.entity.ReviewReceipt;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @Builder
+@ToString
 public class ReviewReceiptDTO {
     private String shopName;
     private String paymentType;

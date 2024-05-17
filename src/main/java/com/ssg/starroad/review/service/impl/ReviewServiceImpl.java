@@ -30,6 +30,11 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    public Long countReviewsByUserId(Long userId) {
+        return null;
+    }
+
+    @Override
     @Transactional
     public Review createReview(Review review) {
         return reviewRepository.save(review);
@@ -74,12 +79,12 @@ public class ReviewServiceImpl implements ReviewService {
     // OCR API를 호출하는 메서드 예시
     public ResponseEntity<String> callOcrApi(MultipartFile imageFile) throws IOException {
         // OCR API 엔드포인트
-        String ocrApiUrl = "https://okn5z02skx.apigw.ntruss.com/custom/v1/30710/25e9f4b0de75101a14c45b2b4db7fc4ef23991aaabb3f2d5c40c7478127278f9/general";
+        String ocrApiUrl = "https://deqz3tj602.apigw.ntruss.com/custom/v1/30975/c4e5e9a47173ca497d023af6f322225681d8d3812a8648c4b32ba29bc7112a59/document/receipt";
 
         // OCR API에 요청을 보낼 때 필요한 headers 설정
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("X-OCR-SECRET", "aGtIcnlRZHZBRFF1cUNrUFFEWHpEWkRqUWVjTExndXk=");
+        headers.set("X-OCR-SECRET", "b1NCaWFVeEpKb0lIbGF3c0xKaHlZS0FnY0tudERDZHQ=");
 
         // 이미지 파일을 Base64 인코딩
         String base64Image = Base64.getEncoder().encodeToString(imageFile.getBytes());
@@ -87,20 +92,20 @@ public class ReviewServiceImpl implements ReviewService {
         // 요청 바디 생성
         Map<String, Object> imageMap = new HashMap<>();
         imageMap.put("format", "png");
-        imageMap.put("name", "medium");
         imageMap.put("data", base64Image);
-        imageMap.put("url", null); // null 값을 허용하는 HashMap 사용
+        imageMap.put("name", "testReceipt");
+//        imageMap.put("url", null); // null 값을 허용하는 HashMap 사용
 
         List<Map<String, Object>> images = new ArrayList<>();
         images.add(imageMap);
 
         Map<String, Object> body = new HashMap<>();
-        body.put("images", images);
-        body.put("lang", "ko");
-        body.put("requestId", "string");
-        body.put("resultType", "string");
+        body.put("version", "V2");
+        body.put("requestId", "ocrCheck");
         body.put("timestamp", System.currentTimeMillis());
-        body.put("version", "V1");
+        body.put("images", images);
+//        body.put("lang", "ko");
+//        body.put("resultType", "string");
 
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);

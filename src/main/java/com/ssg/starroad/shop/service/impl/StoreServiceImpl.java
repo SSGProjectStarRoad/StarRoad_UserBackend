@@ -17,6 +17,7 @@ import com.ssg.starroad.shop.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Pageable;
@@ -43,19 +44,23 @@ public class StoreServiceImpl implements StoreService {
                 .map(StoreDTO::toDTO).collect(Collectors.toList());
 
         return storeDTOList;
-    }
-    @Override
+    }@Override
     public StoreWithReviewDTO findStoreWithReview(Long id, int pageNo, int pageSize) {
         Store store = storeRepository.findById(id).orElseThrow(() -> new RuntimeException("존재하지 않는 스토어입니다."));
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        // 최신순으로 정렬된 Pageable 객체 생성
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        // 정렬된 Pageable 객체를 사용하여 리뷰 페이지 가져오기
         Page<Review> reviewPage = reviewRepository.findAllWithPageByStoreId(id, pageable);
+
         Long totalReviewCount = reviewRepository.countByStoreId(id);
+
         // 각 선택지에 대한 피드백 개수를 조회합니다.
         long revisitCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(id, "재방문 하고 싶어요");
         long serviceSatisfactionCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(id, "서비스가 마음에 들어요");
         long reasonablePriceCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(id, "가격이 합리적입니다");
         long cleanlinessCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(id, "매장이 청결합니다");
-
 
         List<ReviewDTO> reviewDTOList = reviewPage.stream()
                 .map(review -> {
@@ -103,6 +108,7 @@ public class StoreServiceImpl implements StoreService {
                 .cleanlinessCount(cleanlinessCount)
                 .build();
     }
+
 
 
     @Override

@@ -23,6 +23,7 @@ public class ReviewDTO {
     private String userNickname;
     private Long id;
     private Long userId;
+    private String imagePath;
     private Long storeId;
     private boolean visible;
     private Long likeCount;

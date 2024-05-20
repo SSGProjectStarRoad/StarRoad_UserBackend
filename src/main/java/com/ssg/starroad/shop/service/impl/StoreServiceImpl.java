@@ -4,24 +4,23 @@ import com.ssg.starroad.review.DTO.ReviewDTO;
 import com.ssg.starroad.review.DTO.ReviewFeedbackDTO;
 import com.ssg.starroad.review.DTO.ReviewImageDTO;
 import com.ssg.starroad.review.entity.Review;
-import com.ssg.starroad.review.entity.ReviewImage;
 import com.ssg.starroad.review.repository.ReviewImageRepository;
 import com.ssg.starroad.review.repository.ReviewRepository;
 import com.ssg.starroad.review.service.ReviewFeedbackService;
 import com.ssg.starroad.review.service.ReviewImageService;
 import com.ssg.starroad.review.service.ReviewService;
-import com.ssg.starroad.reward.DTO.RewardDTO;
 import com.ssg.starroad.shop.DTO.StoreDTO;
 import com.ssg.starroad.shop.DTO.StoreWithReviewDTO;
 import com.ssg.starroad.shop.entity.Store;
 import com.ssg.starroad.shop.repository.StoreRepository;
 import com.ssg.starroad.shop.service.StoreService;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.mapper.Mapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,26 +44,35 @@ public class StoreServiceImpl implements StoreService {
                 .map(StoreDTO::toDTO).collect(Collectors.toList());
 
         return storeDTOList;
-    }
-
-    @Override
-    public StoreWithReviewDTO findStoreWithReview(Long id) {
-        // 주어진 id로 매장 엔티티를 조회합니다.
+    }@Override
+    public StoreWithReviewDTO findStoreWithReview(Long id, int pageNo, int pageSize) {
         Store store = storeRepository.findById(id).orElseThrow(() -> new RuntimeException("존재하지 않는 스토어입니다."));
-        // 주어진 id로 매장에 속한 리뷰 리스트를 조회합니다.
-        List<Review> reviewList = reviewRepository.findAllByStoreId(id).orElse(Collections.emptyList());
 
-        // 리뷰 엔티티 리스트를 ReviewDTO 리스트로 변환합니다. 이때 각 리뷰에 대한 이미지도 함께 가져옵니다.
-        List<ReviewDTO> reviewDTOList = reviewList.stream()
+        // 최신순으로 정렬된 Pageable 객체 생성
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        // 정렬된 Pageable 객체를 사용하여 리뷰 페이지 가져오기
+        Page<Review> reviewPage = reviewRepository.findAllWithPageByStoreId(id, pageable);
+
+        Long totalReviewCount = reviewRepository.countByStoreId(id);
+
+        // 각 선택지에 대한 피드백 개수를 조회합니다.
+        long revisitCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(id, "재방문 하고 싶어요");
+        long serviceSatisfactionCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(id, "서비스가 마음에 들어요");
+        long reasonablePriceCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(id, "가격이 합리적입니다");
+        long cleanlinessCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(id, "매장이 청결합니다");
+
+        List<ReviewDTO> reviewDTOList = reviewPage.stream()
                 .map(review -> {
                     List<ReviewImageDTO> reviewImageDTOs = reviewImageService.getReviewImages(review.getId());
-                   List<ReviewFeedbackDTO> reviewFeedbackDTOs = reviewFeedbackService.getReviewFeedback(review.getId());
+                    List<ReviewFeedbackDTO> reviewFeedbackDTOs = reviewFeedbackService.getReviewFeedback(review.getId());
                     Long userReviewCount = reviewService.countReviewsByUserId(review.getUser().getId());
 
                     return ReviewDTO.builder()
                             .id(review.getId())
                             .userId(review.getUser().getId())
                             .userNickname(review.getUser().getNickname())
+                            .imagePath(review.getUser().getImagePath())
                             .storeId(review.getStore().getId())
                             .visible(review.isVisible())
                             .createDate(review.getCreatedAt())
@@ -79,7 +87,6 @@ public class StoreServiceImpl implements StoreService {
                 })
                 .collect(Collectors.toList());
 
-        // 매장 정보와 리뷰 정보를 포함한 StoreWithReviewDTO를 생성하여 반환합니다.
         return StoreWithReviewDTO.builder()
                 .id(store.getId())
                 .contents(store.getContents())
@@ -91,8 +98,18 @@ public class StoreServiceImpl implements StoreService {
                 .imagePath(store.getImagePath())
                 .storeType(store.getStoreType())
                 .reviews(reviewDTOList)
+                .pageNumber(reviewPage.getNumber())
+                .pageSize(reviewPage.getSize())
+                .hasNext(reviewPage.hasNext())
+                .totalReviewCount(totalReviewCount)
+                .revisitCount(revisitCount)
+                .serviceSatisfactionCount(serviceSatisfactionCount)
+                .reasonablePriceCount(reasonablePriceCount)
+                .cleanlinessCount(cleanlinessCount)
                 .build();
     }
+
+
 
     @Override
     public StoreDTO findStore(Long id) {

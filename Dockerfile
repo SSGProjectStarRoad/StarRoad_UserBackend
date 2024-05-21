@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # 3. 빌드된 JAR 파일을 복사
-COPY target/your-spring-boot-app.jar /app/your-spring-boot-app.jar
+COPY build/libs/*-0.0.1-SNAPSHOT.jar /app/springboot-app.jar
 
 # 4. 애플리케이션 실행
-ENTRYPOINT ["java", "-jar", "/app/your-spring-boot-app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/springboot-app.jar"]

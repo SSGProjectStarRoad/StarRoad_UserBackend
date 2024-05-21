@@ -27,10 +27,10 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
 
       - name: Create application.properties
-      - uses: actions/checkout@v2
-      - run: touch ./src/main/resources/application.properties
-      - run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
-      - run: cat ./src/main/resources/application.properties
+        run: |
+            touch ./src/main/resources/application.properties
+            echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
+            cat ./src/main/resources/application.properties
 
       - name: Build with Gradle
         run: ./gradlew build

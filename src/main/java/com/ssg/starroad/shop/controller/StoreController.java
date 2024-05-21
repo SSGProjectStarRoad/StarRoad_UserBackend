@@ -29,29 +29,27 @@ public class StoreController {
         return ResponseEntity.ok(storeDTOList);
     }
 
-    // 특정 매장과 그에 대한 리뷰를 함께 조회하는 요청을 처리하는 메소드입니다.
     @GetMapping("/{id}/reviews")
-    public ResponseEntity<StoreWithReviewDTO> StoreGetWithReviewById(@PathVariable Long id) {
+    public ResponseEntity<StoreWithReviewDTO> StoreGetWithReviewById(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         try {
-            // 매장 서비스를 통해 특정 매장과 그에 대한 리뷰를 함께 조회합니다.
-            StoreWithReviewDTO storeWithReviewDTO = storeService.findStoreWithReview(id);
-            // 조회된 매장과 리뷰를 응답으로 반환합니다.
+            StoreWithReviewDTO storeWithReviewDTO = storeService.findStoreWithReview(id, page, size);
             return ResponseEntity.ok(storeWithReviewDTO);
         } catch (RuntimeException e) {
-            // 조회 중에 예외가 발생한 경우 404 응답을 반환합니다.
             return ResponseEntity.notFound().build();
         }
     }
-
     // 특정 매장의 가이드 맵을 조회하는 요청을 처리하는 메소드입니다.
     @GetMapping("/{id}/guidemap")
     public ResponseEntity<StoreDTO> StoreGetGuidemapById(@PathVariable Long id) {
-        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+
         try {
             // 매장 서비스를 통해 특정 매장의 가이드 맵을 조회합니다.
             StoreDTO storeDTO = storeService.findStore(id);
             // 조회된 가이드 맵을 응답으로 반환합니다.
-            log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+
 
             log.info(storeDTO.toString());
             return ResponseEntity.ok(storeDTO);

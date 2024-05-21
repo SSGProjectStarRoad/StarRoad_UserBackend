@@ -55,20 +55,30 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v4
 
+      - name: Install expect
+        run: sudo apt-get update && sudo apt-get install -y expect
+
       - name: SSH to Deploy Server via Jump Host
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.JUMP_HOST }}
-          username: ${{ secrets.JUMP_USER }}
-          password: ${{ secrets.JUMP_PASSWORD }}
-          port: ${{ secrets.JUMP_PORT }}
-          script: |
-            ssh -o StrictHostKeyChecking=no ${{ secrets.JUMP_USER }}@${{ secrets.JUMP_HOST }} << 'EOF'
-              ssh -o StrictHostKeyChecking=no ${{ secrets.PRIVATE_SERVER_USER }}@${{ secrets.PRIVATE_SERVER_HOST }} << 'INNER_EOF'
-                echo "${{ secrets.PRIVATE_SERVER_PASSWORD }}"
-                docker pull ${{ env.DOCKER_IMAGE_NAME }}:latest
-                docker stop springboot_app || true
-                docker rm springboot_app || true
-                docker run -d -p 8080:8080 --name springboot_app ${{ env.DOCKER_IMAGE_NAME }}:latest
-              INNER_EOF
-            EOF
+        run: |
+          expect -c "
+          spawn ssh -o StrictHostKeyChecking=no ${{ secrets.JUMP_USER }}@${{ secrets.JUMP_HOST }}
+          expect \"password:\"
+          send \"${{ secrets.JUMP_PASSWORD }}\r\"
+          expect \"$\"
+          send \"ssh -o StrictHostKeyChecking=no ${{ secrets.PRIVATE_SERVER_USER }}@${{ secrets.PRIVATE_SERVER_HOST }}\r\"
+          expect \"password:\"
+          send \"${{ secrets.PRIVATE_SERVER_PASSWORD }}\r\"
+          expect \"$\"
+          send \"docker pull ${{ env.DOCKER_IMAGE_NAME }}:latest\r\"
+          expect \"$\"
+          send \"docker stop springboot_app || true\r\"
+          expect \"$\"
+          send \"docker rm springboot_app || true\r\"
+          expect \"$\"
+          send \"docker run -d -p 8080:8080 --name springboot_app ${{ env.DOCKER_IMAGE_NAME }}:latest\r\"
+          expect \"$\"
+          send \"exit\r\"
+          expect \"$\"
+          send \"exit\r\"
+          interact
+          "

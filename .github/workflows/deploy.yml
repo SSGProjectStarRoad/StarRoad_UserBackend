@@ -55,6 +55,9 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v4
 
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
       - name: SSH to Deploy Server via Jump Host
         uses: appleboy/ssh-action@master
         with:
@@ -63,7 +66,7 @@ jobs:
           password: ${{ secrets.JUMP_PASSWORD }}
           port: ${{ secrets.JUMP_PORT }}
           script: |
-            ssh -o StrictHostKeyChecking=no ${{ secrets.PRIVATE_SERVER_USER }}@${{ secrets.PRIVATE_SERVER_HOST }} << 'EOF'
+            sshpass -p ${{ secrets.PRIVATE_SERVER_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.PRIVATE_SERVER_USER }}@${{ secrets.PRIVATE_SERVER_HOST }} << 'EOF'
               docker pull ${{ env.DOCKER_IMAGE_NAME }}:latest
               docker stop springboot_app || true
               docker rm springboot_app || true

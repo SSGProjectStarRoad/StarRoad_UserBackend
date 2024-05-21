@@ -55,6 +55,9 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v4
 
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
       - name: SSH to Deploy Server via Jump Host
         uses: appleboy/ssh-action@master
         with:

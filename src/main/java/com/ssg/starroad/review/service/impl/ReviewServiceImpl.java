@@ -34,11 +34,6 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public Long countReviewsByUserId(Long userId) {
-        return null;
-    }
-
-    @Override
     @Transactional
     public Review createReview(Review review) {
         return reviewRepository.save(review);

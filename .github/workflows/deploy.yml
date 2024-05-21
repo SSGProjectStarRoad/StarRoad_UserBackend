@@ -66,9 +66,11 @@ jobs:
           password: ${{ secrets.JUMP_PASSWORD }}
           port: ${{ secrets.JUMP_PORT }}
           script: |
-            sshpass -p ${{ secrets.PRIVATE_SERVER_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.PRIVATE_SERVER_USER }}@${{ secrets.PRIVATE_SERVER_HOST }} << 'EOF'
-              docker pull ${{ env.DOCKER_IMAGE_NAME }}:latest
-              docker stop springboot_app || true
-              docker rm springboot_app || true
-              docker run -d -p 8080:8080 --name springboot_app ${{ env.DOCKER_IMAGE_NAME }}:latest
+            sshpass -p ${{ secrets.JUMP_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.JUMP_USER }}@${{ secrets.JUMP_HOST }} <<EOF
+              sshpass -p ${{ secrets.PRIVATE_SERVER_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.PRIVATE_SERVER_USER }}@${{ secrets.PRIVATE_SERVER_HOST }} << 'INNER_EOF'
+                docker pull ${{ env.DOCKER_IMAGE_NAME }}:latest
+                docker stop springboot_app || true
+                docker rm springboot_app || true
+                docker run -d -p 8080:8080 --name springboot_app ${{ env.DOCKER_IMAGE_NAME }}:latest
+              INNER_EOF
             EOF

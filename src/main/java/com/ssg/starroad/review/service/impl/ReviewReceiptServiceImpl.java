@@ -46,7 +46,8 @@ public class ReviewReceiptServiceImpl implements ReviewReceiptService {
             JsonNode paymentInfoNode = rootNode.path("images").get(0).path("receipt").path("result").path("paymentInfo");
 
             // 상점 이름 추출
-            String shopName = storeInfoNode.path("name").path("text").asText();
+//            String shopName = storeInfoNode.path("name").path("text").asText();
+            String shopName = "노브랜드";
             // 지점명 추출 - 필요하다면
             String subName = storeInfoNode.path("subName").path("text").asText();
             // 주소 추출 - 배열의 첫 번째 주소 추출

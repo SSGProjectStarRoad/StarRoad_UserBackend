@@ -18,9 +18,9 @@ public class Summary {
 
     private final RestTemplate restTemplate;
 
-    @Value("${clova.client.key.id}")
+    @Value("${naver.openapi.client-id}")
     private String CLOVA_API_KEY_ID;
-    @Value("${clova.client.key.secret}")
+    @Value("${naver.openapi.client}")
     private String CLOVA_API_KEY;
 
     // Summary API Option 설정

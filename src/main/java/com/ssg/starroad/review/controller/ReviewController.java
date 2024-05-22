@@ -66,41 +66,34 @@ public class ReviewController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // 모든 리뷰 조회
+
+
     @GetMapping
-    public ResponseEntity<List<ReviewDTO>> getAllReviews() {
-        // 서비스 계층에서 모든 리뷰를 조회
-        List<Review> reviewList = reviewService.getAllReviews();
-
-        // Review 엔티티를 ReviewDTO로 변환
-        List<ReviewDTO> reviewDTOList = reviewList.stream().map(review -> {
-
-//            List<ReviewImageDTO> reviewImageDTOs = reviewImageService.getReviewImages(review.getId());
-//            List<ReviewFeedbackDTO> reviewFeedbackDTOs = reviewFeedbackService.getReviewFeedback(review.getId());
-                    Long userReviewCount = reviewService.countReviewsByUserId(review.getUser().getId());
-
-                    return ReviewDTO.builder()
-                            .id(review.getId())
-                            .userId(review.getUser().getId())
-                            .userNickname(review.getUser().getNickname())
-                            .storeId(review.getStore().getId())
-                            .visible(review.isVisible())
-                            .createDate(review.getCreatedAt())
-                            .likeCount(review.getLikeCount())
-                            .contents(review.getContents())
-                            .summary(review.getSummary())
-                            .confidence(review.getConfidence())
-                            .reviewcount(userReviewCount)
-//                    .reviewImages(reviewImageDTOs)
-                            .build();
-                })
-                // createDate 기준으로 역순 정렬
-                .sorted(Comparator.comparing(ReviewDTO::getCreateDate).reversed())
-                .collect(Collectors.toList());
-
-        // DTO 리스트를 ResponseEntity로 감싸서 반환
-        return ResponseEntity.ok(reviewDTOList);
+    public ResponseEntity<ResponseReviewDTO> getAllReviews(@RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size) {
+        try {
+            ResponseReviewDTO responseReviewDTO = reviewService.findAllReview(page, size);
+            return ResponseEntity.ok(responseReviewDTO);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
+
+    @GetMapping("/following")
+    public ResponseEntity<ResponseReviewDTO> getFollowingReviews(@RequestParam Long id,
+                                                                 @RequestParam(defaultValue = "0") int page,
+                                                                 @RequestParam(defaultValue = "10") int size) {
+        System.out.printf("following 리뷰 메소드 진입");
+        try {
+            System.out.printf("try문 실행");
+            ResponseReviewDTO responseReviewDTO = reviewService.findFollowingReview(id, page, size);
+            return ResponseEntity.ok(responseReviewDTO);
+        } catch (RuntimeException e) {
+            System.out.printf(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 
     @PostMapping("/submit")
     public ResponseEntity<String> submitSurvey(
@@ -129,8 +122,9 @@ public class ReviewController {
 
         MultipartFile[] imagesArray = uploadedImages.toArray(new MultipartFile[0]);
 
-        String imageUrls = s3Uploader.upload(imagesArray, "reviews");
-        String url = imageUrls.split("\\[|\\]")[1];
+        List<String> imageUrls = s3Uploader.upload(imagesArray, "reviews");
+        List<String> urls = imageUrls.stream().map(url -> url.split("\\[|\\]")[1]).toList();
+//        String url = imageUrls.split("\\[|\\]")[1];
 
         // surveyData를 합쳐서 ReviewFeedbackDTO 생성
         String combinedSurveyData = reviewDTO.getCombinedSurveyData();
@@ -140,10 +134,10 @@ public class ReviewController {
                 .build();
 
 
-        reviewImageRepository.save(ReviewImage.builder()
-                        .review(savedReview)
-                        .imagePath(url)
-                .build());
+        urls.stream().map(url -> reviewImageRepository.save(ReviewImage.builder()
+                .review(savedReview)
+                .imagePath(url)
+                .build()));
 
         reviewFeedbackService.addReviewFeedback(reviewFeedbackDTO);
 

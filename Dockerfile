@@ -9,4 +9,4 @@ COPY build/libs/*-0.0.1-SNAPSHOT.jar /app/springboot-app.jar
 COPY src/main/resources/application.properties /app/application.properties
 
 # 4. 애플리케이션 실행
-ENTRYPOINT ["java","-Dspring.profiles.active=production", "-jar", "/app/springboot-app.jar"]
+CMD ["java", "-jar", "springboot-app.jar"]

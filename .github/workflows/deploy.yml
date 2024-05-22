@@ -28,10 +28,10 @@ jobs:
 
       - name: Create application.properties
         run: |
-          mkdir -p ./src/main/resources/config
-          touch ./src/main/resources/config/application.properties
-          echo "${{ secrets.APPLICATION }}" > ./src/main/resources/config/application.properties
-          cat ./src/main/resources/config/application.properties
+          mkdir -p ./src/main/resources
+          touch ./src/main/resources/application.properties
+          echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
+          cat ./src/main/resources/application.properties
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test

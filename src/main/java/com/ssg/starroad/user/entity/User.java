@@ -4,6 +4,8 @@ import com.ssg.starroad.common.entity.BaseTimeEntity;
 import com.ssg.starroad.user.enums.ActiveStatus;
 import com.ssg.starroad.user.enums.Gender;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +17,9 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @Entity
 @NoArgsConstructor(access = PROTECTED)
+@AllArgsConstructor
+@Embeddable
+@Builder
 public class User extends BaseTimeEntity {
 
     @Id
@@ -32,7 +37,7 @@ public class User extends BaseTimeEntity {
     private LocalDate birth;
     private String phone; // xxx-xxxx-xxxx
     @Column(unique = true)
-    private String email;
+    private String email; // 이메일
     @Column(unique = true)
     private String provider; // provider + providerId => unique
 
@@ -41,4 +46,8 @@ public class User extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private ActiveStatus activeStatus;
+
+    public void setProfileimgPath(String path){
+        this.imagePath=path;
+    }
 }

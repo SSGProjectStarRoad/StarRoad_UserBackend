@@ -12,10 +12,14 @@ public class ReviewSelectionDTO {
     private Long id;
     private String shopType;
     private String content;
+    private String essential;
+    private String optional;
 
-    public ReviewSelectionDTO(String shopType, String content) {
+    public ReviewSelectionDTO(String shopType, String content, String essential, String optional) {
         this.shopType = shopType;
         this.content = content;
+        this.essential = essential;
+        this.optional = optional;
     }
 
     // Entity를 DTO로 변환하는 메소드

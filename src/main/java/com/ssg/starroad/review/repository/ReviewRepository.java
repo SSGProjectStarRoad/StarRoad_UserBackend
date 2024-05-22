@@ -32,4 +32,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     // `storeId`는 매장 ID를 의미하고, `selection`은 피드백 선택지를 의미합니다.
     @Query("SELECT COUNT(rf) FROM ReviewFeedback rf WHERE rf.review.store.id = :storeId AND rf.reviewFeedbackSelection = :selection")
     Long countByStoreIdAndReviewFeedbackSelection(@Param("storeId") Long storeId, @Param("selection") String selection);
+
+    // 모든 리뷰를 페이징하여 조회하는 메소드
+    Page<Review> findAll(Pageable pageable);
+    Page<Review> findAllWithPageByUserId(Long userId, Pageable pageable);
+
+    @Query("SELECT r FROM Review r WHERE r.user.id IN :userIds")
+    Page<Review> findAllByUserIds(@Param("userIds") List<Long> userIds, Pageable pageable);
 }

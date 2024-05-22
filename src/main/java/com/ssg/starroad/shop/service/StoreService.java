@@ -12,4 +12,5 @@ public interface StoreService {
    List<StoreDTO> searchStoreList(Long id);
    StoreWithReviewDTO findStoreWithReview(Long id, int pageNo,int pageSize);
    StoreDTO findStore(Long id);
+   String findStoreTypeByName(String name);
 }

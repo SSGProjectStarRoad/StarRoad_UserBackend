@@ -1,9 +1,21 @@
 package com.ssg.starroad.review.service.impl;
 
+import com.ssg.starroad.review.DTO.ResponseReviewDTO;
+import com.ssg.starroad.review.DTO.ReviewDTO;
+import com.ssg.starroad.review.DTO.ReviewFeedbackDTO;
+import com.ssg.starroad.review.DTO.ReviewImageDTO;
 import com.ssg.starroad.review.entity.Review;
+import com.ssg.starroad.review.repository.ReviewFollowRepository;
 import com.ssg.starroad.review.repository.ReviewRepository;
+import com.ssg.starroad.review.service.ReviewFeedbackService;
+import com.ssg.starroad.review.service.ReviewImageService;
 import com.ssg.starroad.review.service.ReviewService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -15,22 +27,22 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final ReviewFollowRepository ReviewFollowRepository;
     private final RestTemplate restTemplate;
+    private final ReviewImageService reviewImageService; // ReviewImageService 인젝션
+    private final ReviewFeedbackService reviewFeedbackService;
+    private final ReviewFollowRepository reviewFollowRepository;
 
     @Override
     public Long countReviewsByUserId(Long userId) {
         return    reviewRepository.countByUserId(userId);
-    }
-
-    @Autowired
-    public ReviewServiceImpl(ReviewRepository reviewRepository, RestTemplate restTemplate) {
-        this.reviewRepository = reviewRepository;
-        this.restTemplate = restTemplate;
     }
 
     @Override
@@ -113,5 +125,90 @@ public class ReviewServiceImpl implements ReviewService {
         ResponseEntity<String> response = restTemplate.postForEntity(ocrApiUrl, entity, String.class);
         System.out.println("callOcrApi : " + response);
         return response;
+    }
+
+    @Override
+    public ResponseReviewDTO findAllReview(int pageNo, int pageSize) {
+        // 최신순으로 정렬된 Pageable 객체 생성
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+        // 정렬된 Pageable 객체를 사용하여 리뷰 페이지 가져오기
+        Page<Review> reviewPage = reviewRepository.findAll(pageable);
+
+//        Long totalReviewCount = reviewRepository.countByStoreId(id);
+
+        List<ReviewDTO> reviewDTOList = reviewPage.stream()
+                .map(review -> {
+                    List<ReviewImageDTO> reviewImageDTOs = reviewImageService.getReviewImages(review.getId());
+                    List<ReviewFeedbackDTO> reviewFeedbackDTOs = reviewFeedbackService.getReviewFeedback(review.getId());
+                    Long userReviewCount = countReviewsByUserId(review.getUser().getId());
+
+                    return ReviewDTO.builder()
+                            .id(review.getId())
+                            .userId(review.getUser().getId())
+                            .userNickname(review.getUser().getNickname())
+                            .imagePath(review.getUser().getImagePath())
+                            .storeId(review.getStore().getId())
+                            .visible(review.isVisible())
+                            .createDate(review.getCreatedAt())
+                            .likeCount(review.getLikeCount())
+                            .contents(review.getContents())
+                            .summary(review.getSummary())
+                            .confidence(review.getConfidence())
+                            .reviewcount(userReviewCount)
+                            .reviewImages(reviewImageDTOs)
+                            .reviewFeedbacks(reviewFeedbackDTOs)
+                            .build();
+                })
+                .collect(Collectors.toList());
+        return ResponseReviewDTO.builder()
+                .reviews(reviewDTOList)
+                .pageNumber(reviewPage.getNumber())
+                .pageSize(reviewPage.getSize())
+                .hasNext(reviewPage.hasNext())
+                .build();
+    }
+
+    @Override
+    public ResponseReviewDTO findFollowingReview(Long id, int pageNo, int pageSize) {
+        // 최신순으로 정렬된 Pageable 객체 생성
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+        // 정렬된 Pageable 객체를 사용하여 리뷰 페이지 가져오기
+
+        List<Long> toUserIds = reviewFollowRepository.findToUserIdsByFromUserId(id);
+
+        Page<Review> reviewPage = reviewRepository.findAllByUserIds(toUserIds, pageable);
+
+//        Page<Review> reviewPage = reviewFollowRepository.findToUserIdsByFromUserId(id).stream().map(followId -> reviewRepository.findAllWithPageByUserId(followId, pageable)).toList().stream().findFirst().orElse(null);
+
+        List<ReviewDTO> reviewDTOList = reviewPage.stream()
+                .map(review -> {
+                    List<ReviewImageDTO> reviewImageDTOs = reviewImageService.getReviewImages(review.getId());
+                    List<ReviewFeedbackDTO> reviewFeedbackDTOs = reviewFeedbackService.getReviewFeedback(review.getId());
+                    Long userReviewCount = countReviewsByUserId(review.getUser().getId());
+
+                    return ReviewDTO.builder()
+                            .id(review.getId())
+                            .userId(review.getUser().getId())
+                            .userNickname(review.getUser().getNickname())
+                            .imagePath(review.getUser().getImagePath())
+                            .storeId(review.getStore().getId())
+                            .visible(review.isVisible())
+                            .createDate(review.getCreatedAt())
+                            .likeCount(review.getLikeCount())
+                            .contents(review.getContents())
+                            .summary(review.getSummary())
+                            .confidence(review.getConfidence())
+                            .reviewcount(userReviewCount)
+                            .reviewImages(reviewImageDTOs)
+                            .reviewFeedbacks(reviewFeedbackDTOs)
+                            .build();
+                })
+                .collect(Collectors.toList());
+        return ResponseReviewDTO.builder()
+                .reviews(reviewDTOList)
+                .pageNumber(reviewPage.getNumber())
+                .pageSize(reviewPage.getSize())
+                .hasNext(reviewPage.hasNext())
+                .build();
     }
 }

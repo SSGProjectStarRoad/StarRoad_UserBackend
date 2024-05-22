@@ -33,7 +33,7 @@ jobs:
           cat ./src/main/resources/application.properties
 
       - name: Build with Gradle
-        run: ./gradlew build -x test
+        run: ./gradlew clean build -x test
 
       - name: Build Docker image
         run: docker build -t ${{ env.DOCKER_IMAGE_NAME }}:latest .

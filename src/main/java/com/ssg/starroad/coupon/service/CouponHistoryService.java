@@ -7,7 +7,7 @@ import java.util.List;
 public interface CouponHistoryService {
 
 
-    void CouponUserAdd(Long userID, Long couponID);
+    int CouponUserAdd(Long userID, Long couponID);
 
 
 

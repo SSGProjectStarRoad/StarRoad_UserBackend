@@ -12,8 +12,8 @@ public class ReviewLikeController {
 
     private final ReviewLikeService reviewLikeService;
 
-    @PostMapping
-    public ResponseEntity<?> addLike(@RequestParam Long userId, @RequestParam Long reviewId) {
+    @PostMapping("/{reviewId}/{userId}")
+    public ResponseEntity<?> addLike(@PathVariable Long reviewId, @PathVariable Long userId) {
         reviewLikeService.addLike(userId, reviewId);
         return ResponseEntity.ok().build();
     }

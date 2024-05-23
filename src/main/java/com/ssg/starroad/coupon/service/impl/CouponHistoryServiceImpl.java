@@ -1,6 +1,7 @@
 package com.ssg.starroad.coupon.service.impl;
 
 import com.ssg.starroad.coupon.DTO.CouponDTO;
+import com.ssg.starroad.coupon.entity.Coupon;
 import com.ssg.starroad.coupon.entity.CouponHistory;
 import com.ssg.starroad.coupon.repository.CouponHistoryRepository;
 import com.ssg.starroad.coupon.repository.CouponRepository;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,16 +32,21 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
     private final RewardProcessRepository rewardProcessRepository;
 
     @Override
-    public void CouponUserAdd(Long userID, Long couponID) {
+    public int CouponUserAdd(Long userID, Long couponID) {
+        Coupon coupon = couponRepository.findById(couponID).orElseThrow();
+        int max = coupon.getMaxAmount();
+        int min = coupon.getMinAmount();
+        int rate = ThreadLocalRandom.current().nextInt(min, max + 1);
+
         CouponHistory couponHistory =
                 new CouponHistory(null, userRepository.findById(userID).orElseThrow(),
-                        couponID,false, LocalDate.now().plusDays(7));
+                        couponID,false, LocalDate.now().plusDays(7),rate);
         couponHistoryRepository.save(couponHistory);
 
         RewardProcess rewardProcess =rewardProcessRepository.findById(userID).orElseThrow();
         rewardProcess.setIssueStatus(true);
         rewardProcessRepository.save(rewardProcess);
-
+        return rate;
     }
 
     @Override

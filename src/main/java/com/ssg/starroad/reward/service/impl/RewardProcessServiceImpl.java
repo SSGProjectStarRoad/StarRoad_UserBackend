@@ -9,7 +9,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -27,7 +29,7 @@ public class RewardProcessServiceImpl implements RewardProcessService {
                 .orElse(new RewardProcess(userId));  // 존재하지 않는 경우 새 객체 생성
 
         rewardProcess.setRewardStatus(false);  // 기존 로직대로 상태 설정
-        rewardProcess.setExpiredAt(LocalDate.now().plusDays(7));
+        rewardProcess.setExpiredAt(LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY)));
         rewardProcess.setReviewCount(0);
         rewardProcess.setCouponCount(0);
         rewardProcessRepository.save(rewardProcess);  // 저장

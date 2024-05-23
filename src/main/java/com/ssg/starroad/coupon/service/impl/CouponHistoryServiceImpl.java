@@ -14,7 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +42,7 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
 
         CouponHistory couponHistory =
                 new CouponHistory(null, userRepository.findById(userID).orElseThrow(),
-                        couponID,false, LocalDate.now().plusDays(7),rate);
+                        couponID,false, LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY)),rate);
         couponHistoryRepository.save(couponHistory);
 
         RewardProcess rewardProcess =rewardProcessRepository.findById(userID).orElseThrow();

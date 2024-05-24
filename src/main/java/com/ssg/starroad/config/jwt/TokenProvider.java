@@ -36,6 +36,7 @@ public class TokenProvider {
 
     // 실제 jwt 토큰 생성 사용자 정보와 만료 시간을 받아 구성, 서명해 반환
     public String createToken(Date expiry, User user) {
+
         Date now = new Date();
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtProperties.getSecretKey()));
 
@@ -96,5 +97,11 @@ public class TokenProvider {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public String generateAccessToken(User user) {
+        // 액세스 토큰의 유효 기간을 설정합니다 (예: 1시간)
+        Duration accessTokenValidity = Duration.ofHours(1);
+        return generateToken(user, accessTokenValidity);
     }
 }

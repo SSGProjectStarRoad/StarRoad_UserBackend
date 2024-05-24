@@ -5,12 +5,16 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 
+import java.util.Optional;
+
 public interface CustomOAuth2UserService extends OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     OAuth2User loadUser(OAuth2UserRequest userRequest);
 
     User findUserByEmail(String email);
 
-    void processOAuthPostLogin(OAuth2User oAuth2User);
+    Optional<User> processOAuthPostLogin(OAuth2User oAuth2User);
+
+    OAuth2User loadUserByProvider(String provider, String code);
 }
 
 // OAuth2 프로세스는 사용자가 예를 들어 Google이나 Facebook 같은 외부 서비스를 사용하여 로그인할 때 발생함

@@ -1,6 +1,7 @@
 package com.ssg.starroad.config;
 
 import com.ssg.starroad.config.jwt.TokenProvider;
+import com.ssg.starroad.user.entity.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -56,6 +58,18 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 // 3. 유효한 토큰인 경우, 사용자 인증 객체를 생성하고 SecurityContextHolder에 등록
                 if (tokenProvider.validToken(token)) {
                     Authentication authentication = tokenProvider.getAuthentication(token);
+
+                    // 사용자 상태 확인
+                    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+                    if (userDetails instanceof User) {
+                        User user = (User) userDetails;
+                        if (!user.isEnabled()) {
+                            log.info("User is not enabled: {}", user.getUsername());
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            return;
+                        }
+                    }
+
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } else {
                     log.info("JWT가 유효하지 않음: {}", token);

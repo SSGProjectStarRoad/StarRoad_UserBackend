@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.Instant;
 
@@ -28,6 +29,7 @@ public class RefreshToken {
     // 리프레시 토큰은 보안 상 중요한 정보
     // 각 토큰 값은 유일무이, 사용자 인증이나 세션 관리 시 안전하게 사용 가능
 
+    @Setter
     @Column(nullable = false)
     private Instant expiryDate;
     // 만료 시간은 토큰의 유효성을 검증할 때 중요한 역할

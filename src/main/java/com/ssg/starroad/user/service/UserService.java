@@ -15,4 +15,16 @@ public interface UserService extends UserDetailsService {
     Long save(UserDTO userDTO);
 
     boolean validateUser(String email, String password);
+
+    boolean isEmailDuplicate(String email); // 이메일 중복 검사
+
+    boolean isNicknameDuplicate(String nickname); // 닉네임 중복 검사
+
+    void registerUser(UserDTO userDTO);
+
+    boolean updatePassword(String email, String newPassword);
+
+    void updateUserProfile(User user, UserDTO userDTO);
+
+    void inactiveUser(String email);
 }

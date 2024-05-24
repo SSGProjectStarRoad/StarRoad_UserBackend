@@ -1,7 +1,7 @@
 package com.ssg.starroad.user.enums;
 
 public enum ProviderType {
-    NAVER, KAKAO, GOOGLE;
+    NAVER, KAKAO, GOOGLE, LOCAL;
 
     // 입력받은 문자열 providerId를 대문자로 변환
     // ProviderType의 valueOf 메소드를 사용하여 해당 문자열과 일치하는 열거형 상수를 반환

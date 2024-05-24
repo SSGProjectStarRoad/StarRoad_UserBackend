@@ -2,16 +2,17 @@ package com.ssg.starroad.user.service.impl;
 
 import com.ssg.starroad.user.dto.UserDTO;
 import com.ssg.starroad.user.entity.User;
+import com.ssg.starroad.user.enums.ProviderType;
+import com.ssg.starroad.user.enums.ActiveStatus;
 import com.ssg.starroad.user.repository.UserRepository;
 import com.ssg.starroad.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.Optional;
 
 @Service
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -26,12 +28,8 @@ public class UserServiceImpl implements UserService {
         User user = userOptional.orElseThrow(() ->
                 new UsernameNotFoundException("User not found with email: " + email));
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
+        return user; // User 엔티티 반환
     }
-    // Collections.singletonList 단일 항목을 포함하는 변경 불가능한 리스트 생성. 단일 권한 처리
 
     // 리프레시 토큰을 이용해 새로운 액세스 토큰을 생성할 때 해당 사용자의 정보를 db에서 조회하기 위해
     // User 클래스에서 id 필드에 해당하며, @Id 어노테이션으로 지정
@@ -51,18 +49,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public Long save(UserDTO userDTO) {
 
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-
         User user = User.builder()
                 .email(userDTO.getEmail())
-                .password(encoder.encode(userDTO.getPassword()))
+                .password(passwordEncoder.encode(userDTO.getPassword()))
                 .name(userDTO.getName())
                 .nickname(userDTO.getNickname())
                 .imagePath(userDTO.getImagePath())
                 .gender(userDTO.getGender())
                 .birth(userDTO.getBirth())
                 .phone(userDTO.getPhone())
-                .providerType(userDTO.getProviderType())
+                .providerType(ProviderType.LOCAL)
                 .providerId(userDTO.getProviderId())
                 .reviewExp(userDTO.getReviewExp())
                 .point(userDTO.getPoint())
@@ -73,7 +69,7 @@ public class UserServiceImpl implements UserService {
     public boolean validateUser(String email, String password) {
 
         Optional<User> userOpt = userRepository.findByEmail(email);
-        if (!userOpt.isPresent()) {
+        if (userOpt.isEmpty()) {
             System.out.println("No user found with email: " + email);
             return false;
         }
@@ -87,5 +83,76 @@ public class UserServiceImpl implements UserService {
         }
 
         return passwordMatches;
+    }
+
+    @Override
+    public boolean isEmailDuplicate(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
+
+    @Override
+    public boolean isNicknameDuplicate(String nickname) {
+        return userRepository.existsByNickname(nickname);
+    }
+
+    @Override
+    public void registerUser(UserDTO userDTO) {
+        User user = User.builder()
+                .name(userDTO.getName())
+                .nickname(userDTO.getNickname())
+                .email(userDTO.getEmail())
+                .password(passwordEncoder.encode(userDTO.getPassword()))
+                .gender(userDTO.getGender())
+                .birth(userDTO.getBirth())
+                .phone(userDTO.getPhone())
+                .providerType(ProviderType.LOCAL)
+                .providerId(null)
+                .reviewExp(0)
+                .point(0)
+                .activeStatus(ActiveStatus.ACTIVE)
+                .build();
+
+        userRepository.save(user);
+    }
+
+    @Override
+    public boolean updatePassword(String email, String newPassword) {
+        System.out.println("Searching for user with email: " + email); // 로그 추가
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user != null) {
+            System.out.println("User found: " + user); // 로그 추가
+            user.updatePassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+            return true;
+        }
+        System.out.println("User not found with email: " + email); // 로그 추가
+        return false;
+    }
+
+    @Transactional
+    @Override
+    public void updateUserProfile(User user, UserDTO userDTO) {
+        String encodedPassword = user.getPassword(); // 기존 비밀번호로 초기화
+
+        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+            // 비밀번호가 비어있지 않을 경우에만 비밀번호 업데이트
+            encodedPassword = passwordEncoder.encode(userDTO.getPassword());
+        }
+
+        user.updateProfile(userDTO.getNickname(), encodedPassword);
+
+        userRepository.save(user);
+        System.out.println("Updated User: " + user);
+        System.out.println("Updated Nickname: " + user.getNickname());
+        System.out.println("Updated Password: " + user.getPassword());
+    }
+
+    @Override
+    public void inactiveUser(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        user.changeActiveStatus(ActiveStatus.INACTIVE);
+        userRepository.save(user);
     }
 }

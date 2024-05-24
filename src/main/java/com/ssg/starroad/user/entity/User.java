@@ -99,11 +99,16 @@ public class User extends BaseTimeEntity implements UserDetails, OAuth2User {
     @Override
     public <A> A getAttribute(String name) {
         switch (name) {
-            case "email": return (A) this.email;
-            case "name": return (A) this.name;
-            case "nickname": return (A) this.nickname;
-            case "imagePath": return (A) this.imagePath;
-            default: return null;  // 해당하는 속성이 없을 경우 null 반환
+            case "email":
+                return (A) this.email;
+            case "name":
+                return (A) this.name;
+            case "nickname":
+                return (A) this.nickname;
+            case "imagePath":
+                return (A) this.imagePath;
+            default:
+                return null;  // 해당하는 속성이 없을 경우 null 반환
         }
     }
 
@@ -160,5 +165,24 @@ public class User extends BaseTimeEntity implements UserDetails, OAuth2User {
         // activeStatus가 ACTIVE인 경우에만 true 반환
         return this.activeStatus == ActiveStatus.ACTIVE;
     }
+    // 로그인을 할 수 있는 전제가 회원의 상태가 active여야 함
+    // 이때 true를 반환
 
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
+
+    // 닉네임, 비밀번호를 변경하는 메소드 추가
+    public void updateProfile(String nickname, String password) {
+        if (nickname != null) {
+            this.nickname = nickname;
+        }
+        if (password != null) {
+            this.password = password;
+        }
+    }
+
+    public void changeActiveStatus(ActiveStatus newStatus) {
+        this.activeStatus = newStatus;
+    }
 }

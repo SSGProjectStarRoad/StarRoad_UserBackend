@@ -8,9 +8,14 @@ import lombok.Getter;
 public class LoginResponse {
     private String accessToken;
     private String refreshToken;
+    private String message;
+
+
+    public LoginResponse(String message) {
+        this.message = message;
+    }
+
 }
-
-
 // 응답에서 리프레시 토큰을 포함하는 이유 ---
 // 사용자가 로그인할 때 마다 새로운 리프레시 토큰을 발급하는 것은,
 // 토큰의 보안을 강화하고, 오래된 또는 잠재적으로 노출된 리프레시 토큰을 무효화하는 효과적인 방법

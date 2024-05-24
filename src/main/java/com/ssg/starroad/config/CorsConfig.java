@@ -13,7 +13,7 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("http://localhost:8080");
+        config.addAllowedOriginPattern("http://localhost:8080"); // Vue 애플리케이션 주소 추가
         config.addAllowedHeader("*"); // 서버가 받을 수 있는 모든 헤더를 정의
 
         // 각 HTTP 메소드를 개별적으로 추가

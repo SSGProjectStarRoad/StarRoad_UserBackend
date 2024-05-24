@@ -21,10 +21,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+
 
 import java.io.IOException;
 
@@ -35,6 +35,7 @@ public class WebSecurityConfig{
 
     private final TokenProvider tokenProvider;
     private final UserService userService;
+    private final Bcrypt passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
@@ -45,7 +46,7 @@ public class WebSecurityConfig{
     public WebSecurityCustomizer webSecurityCustomizer() { // security를 적용하지 않을 리소스
         return web -> web.ignoring()
                 // error endpoint를 열어줌
-                .requestMatchers("/error","/favicon.ico","/user/login");
+                .requestMatchers("/error","/favicon.ico");
     }
 
     @Bean
@@ -58,8 +59,9 @@ public class WebSecurityConfig{
                 .logout(AbstractHttpConfigurer::disable)
                 .sessionManagement(sessionManagementConfig -> sessionManagementConfig
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeRequests(auth -> auth
-                        .requestMatchers("/user/login", "/user/join", "/oauth2/**", "/api/token").permitAll()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/user/login","/user/logout","/user/join/**","/oauth2/**","/api/token/**","/auth/**").permitAll()
+                        .requestMatchers("/user/update-profile","/user/update-password","/user/details","/user/inactive").authenticated()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth -> oauth
                         .loginPage("/user/login")
@@ -78,11 +80,6 @@ public class WebSecurityConfig{
 
     private void accessDeniedHandler(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception) throws IOException {
         response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
-    }
-
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -105,7 +102,7 @@ public class WebSecurityConfig{
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder
                 .userDetailsService(userService)
-                .passwordEncoder(passwordEncoder());
+                .passwordEncoder(passwordEncoder.passwordEncoder());
         return authenticationManagerBuilder.build();
     }
 }

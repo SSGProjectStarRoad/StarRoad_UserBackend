@@ -39,6 +39,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         this.customOAuth2UserService = customOAuth2UserService;
     }
 
+    public static int getRefreshTokenExpiry() {
+        return REFRESH_TOKEN_EXPIRY;
+    }
+
+    public static int getAccessTokenExpiry() {
+        return ACCESS_TOKEN_EXPIRY;
+    }
+
 
     // OAuth2 인증 과정이 성공적으로 완료된 후 실행되는 메소드
     // 1) 사용자 인증 정보를 활용하여 토큰을 생성하고,

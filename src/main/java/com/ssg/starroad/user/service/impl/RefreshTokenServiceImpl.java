@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -37,13 +38,25 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         // 리프레시 토큰의 만료 시간 설정
         Instant expiryDate = Instant.now().plusSeconds(7 * 24 * 3600); // 7일 후 만료
 
-        // 새로운 RefreshToken 객체 생성
-        RefreshToken refreshToken = new RefreshToken(user, generateUniqueToken(), expiryDate);
+        // 고유한 토큰 값을 생성
+        String newToken = generateUniqueToken();
 
-        // 생성된 리프레시 토큰을 데이터베이스에 저장
-        refreshTokenRepository.save(refreshToken);
+        // 기존의 리프레시 토큰이 있는지 확인
+        Optional<RefreshToken> existingTokenOptional = refreshTokenRepository.findByUser_Id(userId);
 
-        return refreshToken.getToken(); // 직접 토큰 문자열 반환
+        if (existingTokenOptional.isPresent()) {
+            // 기존 토큰이 존재하면 업데이트
+            RefreshToken existingToken = existingTokenOptional.get();
+            existingToken.updateToken(newToken);
+            existingToken.setExpiryDate(expiryDate);
+            refreshTokenRepository.save(existingToken);
+            return existingToken.getToken();
+        } else {
+            // 기존 토큰이 존재하지 않으면 새로 생성
+            RefreshToken refreshToken = new RefreshToken(user, newToken, expiryDate);
+            refreshTokenRepository.save(refreshToken);
+            return refreshToken.getToken();
+        }
     }
 
     // 고유한 토큰 값을 생성하는 데 사용. 특히 리프레시 토큰 내에서 고유성을 보장하는 데 사용

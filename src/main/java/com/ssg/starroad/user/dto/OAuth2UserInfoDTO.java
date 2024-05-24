@@ -39,6 +39,7 @@ public class OAuth2UserInfoDTO {
         OAuth2UserInfoDTO dto = new OAuth2UserInfoDTO();
         dto.setEmail(oAuth2User.getAttribute("email"));
         dto.setName(oAuth2User.getAttribute("name"));
+        dto.setNickname(oAuth2User.getAttribute("name"));
         dto.setImagePath(oAuth2User.getAttribute("picture"));
         dto.setProviderType(ProviderType.GOOGLE);
         dto.setProviderId(providerId);
@@ -79,7 +80,7 @@ public class OAuth2UserInfoDTO {
         return User.builder()
                 .email(this.email)
                 .name(this.name)
-                .nickname(this.nickname)
+                .nickname(this.nickname != null ? this.nickname : this.email.split("@")[0]) // 기본 닉네임 설정
                 .imagePath(this.imagePath)
                 .providerType(this.providerType)
                 .providerId(this.providerId)

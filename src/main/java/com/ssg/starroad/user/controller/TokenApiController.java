@@ -40,5 +40,4 @@ public class TokenApiController {
 
         // 클라이언트는 이 토큰을 사용하여 권한이 필요한 리소스에 접근 가능
     }
-
 }

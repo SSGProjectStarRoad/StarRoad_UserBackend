@@ -44,6 +44,7 @@ public class FollowServiceImpl implements FollowService {
                 .id(user.getId())
                 .nickname(user.getNickname())
                 .email(user.getEmail())
+                .profileImgUrl(user.getImagePath())
                 .build();
     }
 

@@ -135,4 +135,11 @@ public class StoreServiceImpl implements StoreService {
 
         return storeDTO;
     }
+
+    @Override
+    // 매장 이름을 이용해 매장을 조회하고 매장 유형을 반환하는 메소드
+    public String findStoreTypeByName(String name) {
+        Store store = storeRepository.findByName(name).orElseThrow(() -> new RuntimeException("존재하지 않는 스토어입니다."));
+        return store.getStoreType();
+    }
 }

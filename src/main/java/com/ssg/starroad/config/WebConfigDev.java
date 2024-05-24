@@ -14,6 +14,7 @@ public class WebConfigDev implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:8080")
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true);
+                .allowCredentials(true)
+                .exposedHeaders("Authorization", "refreshToken"); // 서버의 응답에서 노출할 헤더 추가;;
     }
 }

@@ -118,6 +118,8 @@ public class UserServiceImpl implements UserService {
                 .point(0)
                 .activeStatus(ActiveStatus.ACTIVE)
                 .build();
+
+        userRepository.save(user);
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.ssg.starroad.review.DTO.ReviewFeedbackDTO;
 import com.ssg.starroad.review.DTO.ReviewImageDTO;
 import com.ssg.starroad.review.entity.Review;
 import com.ssg.starroad.review.repository.ReviewImageRepository;
+import com.ssg.starroad.review.repository.ReviewLikeRepository;
 import com.ssg.starroad.review.repository.ReviewRepository;
 import com.ssg.starroad.review.service.ReviewFeedbackService;
 import com.ssg.starroad.review.service.ReviewImageService;
@@ -14,6 +15,7 @@ import com.ssg.starroad.shop.DTO.StoreWithReviewDTO;
 import com.ssg.starroad.shop.entity.Store;
 import com.ssg.starroad.shop.repository.StoreRepository;
 import com.ssg.starroad.shop.service.StoreService;
+import com.ssg.starroad.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,7 +35,8 @@ public class StoreServiceImpl implements StoreService {
     private final ReviewImageService reviewImageService; // ReviewImageService 인젝션
     private final ReviewFeedbackService reviewFeedbackService;
     private final ReviewService reviewService;
-
+    private final ReviewLikeRepository reviewLikeRepository;
+    private final UserRepository userRepository;
     @Override
     public List<StoreDTO> searchStoreList(Long id) {
         // 주어진 complexShoppingmallId로 매장 목록을 조회합니다.
@@ -44,29 +47,31 @@ public class StoreServiceImpl implements StoreService {
                 .map(StoreDTO::toDTO).collect(Collectors.toList());
 
         return storeDTOList;
-    }@Override
-    public StoreWithReviewDTO findStoreWithReview(Long id, int pageNo, int pageSize) {
-        Store store = storeRepository.findById(id).orElseThrow(() -> new RuntimeException("존재하지 않는 스토어입니다."));
+    }
+    @Override
+    public StoreWithReviewDTO findStoreWithReview(Long storeId, String userEmail, int pageNo, int pageSize) {
+        Store store = storeRepository.findById(storeId).orElseThrow(() -> new RuntimeException("존재하지 않는 스토어입니다."));
 
-        // 최신순으로 정렬된 Pageable 객체 생성
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Review> reviewPage = reviewRepository.findAllWithPageByStoreId(storeId, pageable);
 
-        // 정렬된 Pageable 객체를 사용하여 리뷰 페이지 가져오기
-        Page<Review> reviewPage = reviewRepository.findAllWithPageByStoreId(id, pageable);
+        Long totalReviewCount = reviewRepository.countByStoreId(storeId);
+        long revisitCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(storeId, "재방문 하고 싶어요");
+        long serviceSatisfactionCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(storeId, "서비스가 마음에 들어요");
+        long reasonablePriceCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(storeId, "가격이 합리적입니다");
+        long cleanlinessCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(storeId, "매장이 청결합니다");
 
-        Long totalReviewCount = reviewRepository.countByStoreId(id);
-
-        // 각 선택지에 대한 피드백 개수를 조회합니다.
-        long revisitCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(id, "재방문 하고 싶어요");
-        long serviceSatisfactionCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(id, "서비스가 마음에 들어요");
-        long reasonablePriceCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(id, "가격이 합리적입니다");
-        long cleanlinessCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(id, "매장이 청결합니다");
+        // 사용자 이메일을 통해 좋아요 상태 확인
+        Long userId = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.")).getId();
+//        List<Long> likedReviewIds = reviewLikeRepository.findLikedReviewIdsByUserId(userId);
 
         List<ReviewDTO> reviewDTOList = reviewPage.stream()
                 .map(review -> {
                     List<ReviewImageDTO> reviewImageDTOs = reviewImageService.getReviewImages(review.getId());
                     List<ReviewFeedbackDTO> reviewFeedbackDTOs = reviewFeedbackService.getReviewFeedback(review.getId());
                     Long userReviewCount = reviewService.countReviewsByUserId(review.getUser().getId());
+//                    boolean isLiked = likedReviewIds.contains(review.getId());
+                    boolean isLiked = reviewLikeRepository.existsByUser_IdAndReview_Id(userId, review.getId());
 
                     return ReviewDTO.builder()
                             .id(review.getId())
@@ -83,6 +88,7 @@ public class StoreServiceImpl implements StoreService {
                             .reviewcount(userReviewCount)
                             .reviewImages(reviewImageDTOs)
                             .reviewFeedbacks(reviewFeedbackDTOs)
+                            .isLiked(isLiked) // 로그인한 사용자가 좋아요를 눌렀는지 여부 추가
                             .build();
                 })
                 .collect(Collectors.toList());
@@ -108,6 +114,7 @@ public class StoreServiceImpl implements StoreService {
                 .cleanlinessCount(cleanlinessCount)
                 .build();
     }
+
 
 
 

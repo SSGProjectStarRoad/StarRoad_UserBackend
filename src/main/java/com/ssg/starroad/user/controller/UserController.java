@@ -153,7 +153,7 @@ public class UserController {
         return ResponseEntity.ok("User deactivated successfully");
 
     }
-}
+
 
 
     @GetMapping("/mypage/{userId}")

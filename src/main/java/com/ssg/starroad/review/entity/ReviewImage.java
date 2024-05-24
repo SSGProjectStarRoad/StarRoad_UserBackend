@@ -1,10 +1,9 @@
 package com.ssg.starroad.review.entity;
 
 import com.ssg.starroad.common.entity.BaseTimeEntity;
-import com.ssg.starroad.review.enums.ConfidenceType;
-import com.ssg.starroad.shop.entity.Store;
-import com.ssg.starroad.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +13,9 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @Entity
 @NoArgsConstructor(access = PROTECTED)
+@Embeddable
+@AllArgsConstructor
+@Builder
 public class ReviewImage extends BaseTimeEntity {
 
     @Id
@@ -26,4 +28,9 @@ public class ReviewImage extends BaseTimeEntity {
 
     @Column
     private String imagePath;
+
+    // 이미지 경로 업데이트 메소드
+    public void updateImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
 }

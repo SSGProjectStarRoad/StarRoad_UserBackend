@@ -1,9 +1,11 @@
 package com.ssg.starroad.user.service;
 
+
 import com.ssg.starroad.user.dto.UserDTO;
 import com.ssg.starroad.user.entity.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
-
+import com.ssg.starroad.user.dto.MypageDTO;
+import org.springframework.web.multipart.MultipartFile;
 import java.util.Optional;
 
 public interface UserService extends UserDetailsService {
@@ -27,4 +29,11 @@ public interface UserService extends UserDetailsService {
     void updateUserProfile(User user, UserDTO userDTO);
 
     void inactiveUser(String email);
+
+    Optional<String> findNicknameById(Long id);
+    public MypageDTO getMypage(Long id);
+    public void saveProfileimg(Long id, String path);
+    public String getProfileimg(Long id);
+    public void deleteProfileimg(Long id);
+
 }

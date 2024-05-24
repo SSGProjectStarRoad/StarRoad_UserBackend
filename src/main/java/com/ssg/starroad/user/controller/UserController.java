@@ -1,10 +1,13 @@
 package com.ssg.starroad.user.controller;
 
+
 import com.ssg.starroad.config.jwt.TokenProvider;
 import com.ssg.starroad.user.dto.*;
 import com.ssg.starroad.user.entity.User;
 import com.ssg.starroad.user.repository.RefreshTokenRepository;
 import com.ssg.starroad.user.service.RefreshTokenService;
+import com.ssg.starroad.common.service.S3Uploader;
+import com.ssg.starroad.user.dto.MypageDTO;
 import com.ssg.starroad.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +17,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 
 @RequestMapping("/user")
 @RestController
@@ -28,7 +34,7 @@ public class UserController {
     private final TokenProvider tokenProvider;
     private final RefreshTokenService refreshTokenService;
     private final RefreshTokenRepository refreshTokenRepository;
-
+    private final S3Uploader s3Uploader;
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         boolean isValidUser = userService.validateUser(request.getEmail(), request.getPassword());
@@ -146,5 +152,39 @@ public class UserController {
         userService.inactiveUser(email);
         return ResponseEntity.ok("User deactivated successfully");
 
+    }
+}
+
+
+    @GetMapping("/mypage/{userId}")
+    public ResponseEntity<MypageDTO> getMypage(@PathVariable Long userId) {
+        MypageDTO mypageDTO=userService.getMypage(userId);
+        if (mypageDTO==null) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(mypageDTO);
+    }
+
+    @PostMapping("/profile/upload/img/{userId}")
+    public ResponseEntity<?> uploadImg(@PathVariable Long userId, @RequestParam("file") MultipartFile uploadImg) {
+        String path = s3Uploader.upload(uploadImg,"ssg/user/profile");
+        userService.saveProfileimg(userId,path);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/profile/get/img/{userId}")
+    public ResponseEntity<?> getImg(@PathVariable Long userId)
+    {
+        String path =userService.getProfileimg(userId);
+        if (path==null) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(path.trim());
+    }
+
+    @DeleteMapping("/profile/delete/img/{userId}")
+    public ResponseEntity<?> deleteImg(@PathVariable Long userId){
+        userService.deleteProfileimg(userId);
+        return ResponseEntity.ok().build();
     }
 }

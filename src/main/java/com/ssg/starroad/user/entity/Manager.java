@@ -3,6 +3,8 @@ package com.ssg.starroad.user.entity;
 import com.ssg.starroad.common.entity.BaseTimeEntity;
 import com.ssg.starroad.user.enums.Authority;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +13,9 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor(access = PROTECTED)
+@AllArgsConstructor
 public class Manager extends BaseTimeEntity {
 
     @Id

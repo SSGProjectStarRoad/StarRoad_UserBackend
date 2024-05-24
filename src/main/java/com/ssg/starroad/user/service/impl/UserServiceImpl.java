@@ -1,5 +1,6 @@
 package com.ssg.starroad.user.service.impl;
 
+
 import com.ssg.starroad.user.dto.UserDTO;
 import com.ssg.starroad.user.entity.User;
 import com.ssg.starroad.user.enums.ProviderType;
@@ -12,6 +13,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.ssg.starroad.user.dto.MypageDTO;
+import org.modelmapper.ModelMapper;
+import org.springframework.web.multipart.MultipartFile;
+
 
 import java.util.Optional;
 
@@ -19,8 +24,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -111,11 +118,27 @@ public class UserServiceImpl implements UserService {
                 .point(0)
                 .activeStatus(ActiveStatus.ACTIVE)
                 .build();
+    }
 
+    @Override
+    public Optional<String> findNicknameById(Long id) {
+        Optional<User> userOptional = userRepository.findById(id);
+        return userOptional.map(User::getNickname);
+    }
+
+    public MypageDTO getMypage(Long id) {
+        return userRepository.findById(id).map(info -> modelMapper.map(info, MypageDTO.class)).orElse(null);
+    }
+
+    @Override
+    public void saveProfileimg(Long id, String path) {
+        User user=userRepository.findById(id).orElseThrow();
+        user.setProfileimgPath(path);
         userRepository.save(user);
     }
 
     @Override
+
     public boolean updatePassword(String email, String newPassword) {
         System.out.println("Searching for user with email: " + email); // 로그 추가
         User user = userRepository.findByEmail(email).orElse(null);
@@ -153,6 +176,17 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         user.changeActiveStatus(ActiveStatus.INACTIVE);
+    }
+
+    public String getProfileimg(Long id) {
+        User user =userRepository.findById(id).orElseThrow();
+        return user.getImagePath();
+    }
+
+    @Override
+    public void deleteProfileimg(Long id) {
+        User user =userRepository.findById(id).orElseThrow();
+        user.setProfileimgPath("");
         userRepository.save(user);
     }
 }

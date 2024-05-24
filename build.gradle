@@ -23,12 +23,13 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
+//	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+//	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-mail:3.0.5'
 	implementation 'com.sun.mail:jakarta.mail:2.0.1' // 버전을 2.0.1로 변경
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
 
 	// LOMBOK
 	compileOnly 'org.projectlombok:lombok'
@@ -50,10 +51,19 @@ dependencies {
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
+
 	// JWT Support
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 	// JSON 처리를 위해 jackson 연동 모듈 추가
+
+	// AWS S3
+	implementation 'com.amazonaws:aws-java-sdk-s3'
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+	// JSON
+	implementation 'org.json:json:20231013'
+
 
 	// TEST IMPLEMENTATION ========================
 	// TEST DATABASE H2
@@ -62,7 +72,7 @@ dependencies {
 
 	// TEST JUNIT
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
+//	testImplementation 'org.springframework.security:spring-security-test'
 }
 
 

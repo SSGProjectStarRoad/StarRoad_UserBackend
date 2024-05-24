@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <!-- 콘솔에 로그를 출력하는 Appender -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        <!-- 파일에 로그를 출력하는 Appender -->
+        <File name="File" fileName="logs/mylog.log">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>
+    </Appenders>
+    <Loggers>
+        <!-- 기본적인 설정 -->
+        <Root level="Info">
+            <AppenderRef ref="Console"/> <!-- 콘솔에 로그 출력 -->
+            <AppenderRef ref="File"/>    <!-- 파일에 로그 출력 -->
+        </Root>
+    </Loggers>
+</Configuration>

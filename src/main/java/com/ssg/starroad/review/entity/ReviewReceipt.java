@@ -3,8 +3,7 @@ package com.ssg.starroad.review.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -12,8 +11,12 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Getter
+@Setter
 @Entity
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
+@ToString
 public class ReviewReceipt {
     @Id
     @GeneratedValue(strategy = IDENTITY)

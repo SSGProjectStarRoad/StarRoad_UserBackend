@@ -36,7 +36,6 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor
 @Embeddable
-@Builder
 
 public class User extends BaseTimeEntity implements UserDetails, OAuth2User {
 
@@ -188,7 +187,7 @@ public class User extends BaseTimeEntity implements UserDetails, OAuth2User {
 
     public void changeActiveStatus(ActiveStatus newStatus) {
         this.activeStatus = newStatus;
-
+    }
     public void setProfileimgPath(String path){
         this.imagePath=path;
 

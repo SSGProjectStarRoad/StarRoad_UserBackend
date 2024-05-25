@@ -80,7 +80,7 @@ public class OAuth2UserInfoDTO {
         return User.builder()
                 .email(this.email)
                 .name(this.name)
-                .nickname(this.nickname != null ? this.nickname : this.email.replaceAll("(@.*)","")) // 기본 닉네임 설정
+                .nickname(this.nickname != null ? this.nickname : this.email) // 기본 닉네임 설정
                 .imagePath(this.imagePath)
                 .providerType(this.providerType)
                 .providerId(this.providerId)

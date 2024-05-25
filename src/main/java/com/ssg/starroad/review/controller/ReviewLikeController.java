@@ -27,8 +27,7 @@ public class ReviewLikeController {
 
     @PostMapping("/{reviewId}/{userEmail}")
     public ResponseEntity<ReviewLikeDTO> addLike(@PathVariable Long reviewId, @PathVariable String userEmail) {
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
         ReviewLikeDTO response = reviewLikeService.addLike(userEmail, reviewId);
         return ResponseEntity.ok(response);
     }

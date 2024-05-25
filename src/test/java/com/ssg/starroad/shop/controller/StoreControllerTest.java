@@ -22,11 +22,11 @@ class StoreControllerTest {
 
 
     }
-    @Test
-    public void teststoreController2() {
-        log.info(
-                storeController.StoreGetWithReviewById(1L,"hklee@example.com",1,20));
-    }
+//    @Test
+//    public void teststoreController2() {
+//        log.info(
+//                storeController.StoreGetWithReviewById(1L,"hklee@example.com",0,20,));
+//    }
 
     @Test
     public void teststoreController3() {

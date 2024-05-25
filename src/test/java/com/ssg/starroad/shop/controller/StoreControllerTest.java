@@ -25,7 +25,7 @@ class StoreControllerTest {
     @Test
     public void teststoreController2() {
         log.info(
-                storeController.StoreGetWithReviewById(3L,"hklee@example.com",1,20));
+                storeController.StoreGetWithReviewById(1L,"hklee@example.com",1,20));
     }
 
     @Test

@@ -32,14 +32,15 @@ public class StoreController {
     @GetMapping("/{id}/reviews")
     public ResponseEntity<StoreWithReviewDTO> StoreGetWithReviewById(
             @PathVariable Long id,
-            @RequestParam String userEmail,  // userId 파라미터 추
+            @RequestParam String userEmail,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         try {
-            String test = "hklee@example.com";
-            StoreWithReviewDTO storeWithReviewDTO = storeService.findStoreWithReview(id, test, page, size);
+            log.info("Received request for store ID: {}, userEmail: {}, page: {}, size: {}", id, userEmail, page, size);
+            StoreWithReviewDTO storeWithReviewDTO = storeService.findStoreWithReview(id, userEmail, page, size);
             return ResponseEntity.ok(storeWithReviewDTO);
         } catch (RuntimeException e) {
+            log.error("리뷰가 있는 상점을 가져오는데 실패했습니다", e);
             return ResponseEntity.notFound().build();
         }
     }

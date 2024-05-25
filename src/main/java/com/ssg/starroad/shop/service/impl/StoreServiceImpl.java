@@ -128,11 +128,13 @@ public class StoreServiceImpl implements StoreService {
                 .storeGuideMap(store.getStoreGuideMap())
                 .name(store.getName())
                 .floor(store.getFloor().getFloor())
-                        .build();
+                .build();
 
 
 
 
         return storeDTO;
     }
+
+
 }

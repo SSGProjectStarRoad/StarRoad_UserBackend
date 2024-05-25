@@ -48,7 +48,7 @@ public class CustomOAuth2UserServiceImpl extends DefaultOAuth2UserService implem
         if (existingUser.isPresent()) {
             user = updateExistingUser(existingUser.get(), userInfoDTO);
         } else {
-            String nickname = userInfoDTO.getNickname() != null ? userInfoDTO.getNickname() : userInfoDTO.getEmail().replaceAll("(@.*)","");
+            String nickname = userInfoDTO.getNickname() != null ? userInfoDTO.getNickname() : userInfoDTO.getEmail();
             user = User.builder()
                     .email(userInfoDTO.getEmail())
                     .name(userInfoDTO.getName())

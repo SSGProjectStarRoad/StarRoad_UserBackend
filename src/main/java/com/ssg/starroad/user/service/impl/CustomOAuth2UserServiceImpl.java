@@ -48,7 +48,7 @@ public class CustomOAuth2UserServiceImpl extends DefaultOAuth2UserService implem
         if (existingUser.isPresent()) {
             user = updateExistingUser(existingUser.get(), userInfoDTO);
         } else {
-            String nickname = userInfoDTO.getNickname() != null ? userInfoDTO.getNickname() : userInfoDTO.getEmail();
+            String nickname = userInfoDTO.getNickname() != null ? userInfoDTO.getNickname() : generateTempNickname();
             user = User.builder()
                     .email(userInfoDTO.getEmail())
                     .name(userInfoDTO.getName())
@@ -74,6 +74,13 @@ public class CustomOAuth2UserServiceImpl extends DefaultOAuth2UserService implem
                 response,
                 "email"
         );
+    }
+
+    private String generateTempNickname() {
+        long unixTimestamp = System.currentTimeMillis() / 1000L;
+        String timestampStr = String.valueOf(unixTimestamp);
+        String lastSixDigits = timestampStr.length() > 6 ? timestampStr.substring(timestampStr.length() - 6) : timestampStr;
+        return "star" + lastSixDigits;
     }
 
     private String getProviderId(OAuth2User oAuth2User, String provider) {

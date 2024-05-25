@@ -17,15 +17,15 @@ public class CouponController {
     private final CouponHistoryService couponHistoryService;
 
     @PostMapping("/issue")
-    public ResponseEntity<String> issueCoupon(@RequestBody IssueCouponRequest request) {
+    public ResponseEntity<Integer> issueCoupon(@RequestBody IssueCouponRequest request) {
 
         if (request.getUserId() == null || request.getCouponId() == null) {
-            return ResponseEntity.badRequest().body("UserId or CouponId cannot be null");
+            return ResponseEntity.badRequest().body(0);
         }
 
-        couponHistoryService.CouponUserAdd(request.getUserId(), request.getCouponId());
+        int rate = couponHistoryService.CouponUserAdd(request.getUserId(), request.getCouponId());
 
-        return ResponseEntity.ok("Coupon issued successfully to user ID " + request.getUserId());
+        return ResponseEntity.ok(rate);
     }
     @GetMapping("/{userId}/coupon/list")
     public ResponseEntity<List<CouponDTO>> getUserCoupons(@PathVariable Long userId) {

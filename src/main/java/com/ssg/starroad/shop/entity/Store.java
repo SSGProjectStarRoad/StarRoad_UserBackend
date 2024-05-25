@@ -9,15 +9,20 @@ import com.ssg.starroad.shop.enums.Floor;
 import com.ssg.starroad.user.entity.Manager;
 import com.ssg.starroad.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
+@Builder
+@AllArgsConstructor
 @Getter
 @Entity
 @NoArgsConstructor(access = PROTECTED)
+@Table(name = "store")
 public class Store extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)

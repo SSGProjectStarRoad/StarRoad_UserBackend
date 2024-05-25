@@ -35,6 +35,12 @@ public class StoreServiceImpl implements StoreService {
     private final ReviewImageService reviewImageService; // ReviewImageService 인젝션
     private final ReviewFeedbackService reviewFeedbackService;
     private final ReviewService reviewService;
+
+    @Override
+    public String findStoreTypeByName(String name) {
+        return "";
+    }
+
     private final ReviewLikeRepository reviewLikeRepository;
     private final UserRepository userRepository;
     @Override

@@ -21,4 +21,6 @@ public interface ReviewReceiptService {
 
     // ID를 기반으로 리뷰 영수증 정보를 삭제합니다.
     void deleteReviewReceipt(Long id);
+
+    ReviewReceiptDTO processAndSaveOcrResult(String ocrResultJson);
 }

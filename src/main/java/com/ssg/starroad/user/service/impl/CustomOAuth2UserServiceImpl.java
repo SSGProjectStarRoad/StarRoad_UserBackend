@@ -3,6 +3,7 @@ package com.ssg.starroad.user.service.impl;
 import com.ssg.starroad.config.jwt.TokenProvider;
 import com.ssg.starroad.user.dto.OAuth2UserInfoDTO;
 import com.ssg.starroad.user.entity.User;
+import com.ssg.starroad.user.enums.ActiveStatus;
 import com.ssg.starroad.user.enums.ProviderType;
 import com.ssg.starroad.user.repository.UserRepository;
 import com.ssg.starroad.user.service.CustomOAuth2UserService;
@@ -47,10 +48,14 @@ public class CustomOAuth2UserServiceImpl extends DefaultOAuth2UserService implem
         if (existingUser.isPresent()) {
             user = updateExistingUser(existingUser.get(), userInfoDTO);
         } else {
-            String nickname = userInfoDTO.getNickname() != null ? userInfoDTO.getNickname() : userInfoDTO.getEmail().split("@")[0];
+            String nickname = userInfoDTO.getNickname() != null ? userInfoDTO.getNickname() : userInfoDTO.getEmail().replaceAll("(@.*)","");
             user = User.builder()
                     .email(userInfoDTO.getEmail())
+                    .name(userInfoDTO.getName())
                     .nickname(nickname)
+                    .providerId(userInfoDTO.getProviderId())
+                    .providerType(userInfoDTO.getProviderType())
+                    .activeStatus(ActiveStatus.ACTIVE)
                     .build();
             user = userRepository.save(user);
         }

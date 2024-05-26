@@ -42,7 +42,7 @@ class StoreServiceImplTest {
     @Test
     @DisplayName("Store단일 매장 전체 리뷰 작성메소드 테스트")
     void StoreWithAllReviewTest() {
-        log.info(storeService.findStoreWithReview(2L,1,20));
+        log.info(storeService.findStoreWithReview(2L,"hklee@example.com",1,20));
 
     }
 

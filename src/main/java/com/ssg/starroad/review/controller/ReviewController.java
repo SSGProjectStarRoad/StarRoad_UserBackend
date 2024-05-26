@@ -75,7 +75,7 @@ public class ReviewController {
             ResponseReviewDTO responseReviewDTO = reviewService.findAllReview(page, size);
             return ResponseEntity.ok(responseReviewDTO);
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -98,8 +98,9 @@ public class ReviewController {
     @PostMapping("/submit")
     public ResponseEntity<String> submitSurvey(
             @RequestPart("review") String reviewStr, // JSON 문자열로 받습니다.
-            @RequestPart("images") List<MultipartFile> uploadedImages) throws IOException {
+            @RequestPart(value = "images", required = false) List<MultipartFile> uploadedImages) throws IOException {
 
+        System.out.printf("UploadedImaged : " + uploadedImages);
         // JSON 문자열을 ReviewDTO 객체로 변환합니다.
         ReviewDTO reviewDTO = new ObjectMapper().readValue(reviewStr, ReviewDTO.class);
 
@@ -120,11 +121,15 @@ public class ReviewController {
                 .build());
         Long reviewId = savedReview.getId();
 
-        MultipartFile[] imagesArray = uploadedImages.toArray(new MultipartFile[0]);
+        List<String> imageUrls = new ArrayList<>();
+        if (uploadedImages != null && !uploadedImages.isEmpty()) {
+            imageUrls = s3Uploader.upload(uploadedImages.toArray(new MultipartFile[uploadedImages.size()]), "ssg/reviews");
+        }
 
-        List<String> imageUrls = s3Uploader.upload(imagesArray, "reviews");
-        List<String> urls = imageUrls.stream().map(url -> url.split("\\[|\\]")[1]).toList();
-//        String url = imageUrls.split("\\[|\\]")[1];
+        System.out.println("================================================================");
+        for (String imageUrl : imageUrls) {
+            System.out.println(imageUrl);
+        }
 
         // surveyData를 합쳐서 ReviewFeedbackDTO 생성
         String combinedSurveyData = reviewDTO.getCombinedSurveyData();
@@ -133,8 +138,7 @@ public class ReviewController {
                 .reviewFeedbackSelection(combinedSurveyData)
                 .build();
 
-
-        urls.stream().map(url -> reviewImageRepository.save(ReviewImage.builder()
+        imageUrls.forEach(url -> reviewImageRepository.save(ReviewImage.builder()
                 .review(savedReview)
                 .imagePath(url)
                 .build()));

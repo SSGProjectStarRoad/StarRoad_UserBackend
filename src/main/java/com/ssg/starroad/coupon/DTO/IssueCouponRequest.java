@@ -3,7 +3,7 @@ package com.ssg.starroad.coupon.DTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class IssueCouponRequest {
-    @JsonProperty("userEmail")
+    @JsonProperty("email")
     private String email;
     @JsonProperty("couponId")
     private Long couponId;

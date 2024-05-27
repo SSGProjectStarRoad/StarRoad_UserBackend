@@ -128,13 +128,15 @@ public class UserServiceImpl implements UserService {
         return userOptional.map(User::getNickname);
     }
 
-    public MypageDTO getMypage(Long id) {
+    public MypageDTO getMypage(String email) {
+        Long id = userRepository.findByEmail(email).orElseThrow().getId();
         return userRepository.findById(id).map(info -> modelMapper.map(info, MypageDTO.class)).orElse(null);
     }
 
     @Override
-    public void saveProfileimg(Long id, String path) {
-        User user=userRepository.findById(id).orElseThrow();
+    public void saveProfileimg(String email, String path) {
+
+        User user=userRepository.findByEmail(email).orElseThrow();
         user.setProfileimgPath(path);
         userRepository.save(user);
     }
@@ -180,14 +182,14 @@ public class UserServiceImpl implements UserService {
         user.changeActiveStatus(ActiveStatus.INACTIVE);
     }
 
-    public String getProfileimg(Long id) {
-        User user =userRepository.findById(id).orElseThrow();
+    public String getProfileimg(String email) {
+        User user =userRepository.findByEmail(email).orElseThrow();
         return user.getImagePath();
     }
 
     @Override
-    public void deleteProfileimg(Long id) {
-        User user =userRepository.findById(id).orElseThrow();
+    public void deleteProfileimg(String email) {
+        User user =userRepository.findByEmail(email).orElseThrow();
         user.setProfileimgPath("");
         userRepository.save(user);
     }

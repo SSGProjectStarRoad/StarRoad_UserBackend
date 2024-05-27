@@ -4,6 +4,7 @@ import com.ssg.starroad.reward.DTO.RewardProcessDTO;
 import com.ssg.starroad.reward.entity.RewardProcess;
 import com.ssg.starroad.reward.repository.RewardProcessRepository;
 import com.ssg.starroad.reward.service.RewardProcessService;
+import com.ssg.starroad.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -20,11 +21,13 @@ import java.util.Optional;
 public class RewardProcessServiceImpl implements RewardProcessService {
 
     private final RewardProcessRepository rewardProcessRepository;
+    private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
     @Override
     @Transactional
-    public void startRewardProcess(Long userId) {
+    public void startRewardProcess(String email) {
+        Long userId = userRepository.findByEmail(email).orElseThrow().getId();
         RewardProcess rewardProcess = rewardProcessRepository.findById(userId)
                 .orElse(new RewardProcess(userId));  // 존재하지 않는 경우 새 객체 생성
 
@@ -46,7 +49,8 @@ public class RewardProcessServiceImpl implements RewardProcessService {
 
     @Override
     @Transactional
-    public void updateReviewCount(Long userId) {
+    public void updateReviewCount(String email) {
+        Long userId = userRepository.findByEmail(email).orElseThrow().getId();
         RewardProcess rewardProcess = rewardProcessRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user ID: " + userId));
         rewardProcess.setReviewCount(rewardProcess.getReviewCount() + 1);
@@ -55,7 +59,8 @@ public class RewardProcessServiceImpl implements RewardProcessService {
 
     @Override
     @Transactional
-    public void updateStatus(Long userId) {
+    public void updateStatus(String email) {
+        Long userId = userRepository.findByEmail(email).orElseThrow().getId();
         RewardProcess rewardProcess = rewardProcessRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user ID: " + userId));
         rewardProcess.setRewardStatus(true);
@@ -63,7 +68,8 @@ public class RewardProcessServiceImpl implements RewardProcessService {
     }
 
     @Override
-    public void resetStatus(Long userId) {
+    public void resetStatus(String email) {
+        Long userId = userRepository.findByEmail(email).orElseThrow().getId();
         RewardProcess rewardProcess = rewardProcessRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user ID: " + userId));
         rewardProcess.setIssueStatus(false);
@@ -73,7 +79,8 @@ public class RewardProcessServiceImpl implements RewardProcessService {
 
     @Override
     @Transactional
-    public RewardProcessDTO getProcess(Long userId){
+    public RewardProcessDTO getProcess(String email){
+        Long userId = userRepository.findByEmail(email).orElseThrow().getId();
         RewardProcess rewardProcess = rewardProcessRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user ID: " + userId));
         if(Objects.equals(rewardProcess.getExpiredAt(), LocalDate.now()))

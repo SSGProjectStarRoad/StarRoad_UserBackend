@@ -29,6 +29,6 @@ public class RewardController {
     @PostMapping("/obtain")
     public ResponseEntity<?> Rewardobtain(@RequestBody RewardMemberDTO rewardmemberDTO){
         rewardHistoryService.addReward(rewardmemberDTO);
-        return ResponseEntity.ok("Reward issued successfully to user ID " + rewardmemberDTO.getMemberId());
+        return ResponseEntity.ok("Reward issued successfully to user email " + rewardmemberDTO.getEmail());
     }
 }

@@ -31,9 +31,9 @@ public interface UserService extends UserDetailsService {
     void inactiveUser(String email);
 
     Optional<String> findNicknameById(Long id);
-    public MypageDTO getMypage(Long id);
-    public void saveProfileimg(Long id, String path);
-    public String getProfileimg(Long id);
-    public void deleteProfileimg(Long id);
+    public MypageDTO getMypage(String email);
+    public void saveProfileimg(String email, String path);
+    public String getProfileimg(String email);
+    public void deleteProfileimg(String email);
 
 }

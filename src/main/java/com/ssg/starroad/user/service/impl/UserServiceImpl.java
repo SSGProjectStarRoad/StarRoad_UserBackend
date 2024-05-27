@@ -128,13 +128,21 @@ public class UserServiceImpl implements UserService {
         return userOptional.map(User::getNickname);
     }
 
-    public MypageDTO getMypage(Long id) {
-        return userRepository.findById(id).map(info -> modelMapper.map(info, MypageDTO.class)).orElse(null);
+    public MypageDTO getMypage(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        return MypageDTO.builder()
+                .nickname(user.getNickname())
+                .profileImg(user.getImagePath())
+                .reviewExp(user.getReviewExp())
+                .name(user.getUserName())
+                .point(user.getPoint())
+                .build();
     }
 
     @Override
-    public void saveProfileimg(Long id, String path) {
-        User user=userRepository.findById(id).orElseThrow();
+    public void saveProfileimg(String email, String path) {
+
+        User user=userRepository.findByEmail(email).orElseThrow();
         user.setProfileimgPath(path);
         userRepository.save(user);
     }
@@ -180,14 +188,14 @@ public class UserServiceImpl implements UserService {
         user.changeActiveStatus(ActiveStatus.INACTIVE);
     }
 
-    public String getProfileimg(Long id) {
-        User user =userRepository.findById(id).orElseThrow();
+    public String getProfileimg(String email) {
+        User user =userRepository.findByEmail(email).orElseThrow();
         return user.getImagePath();
     }
 
     @Override
-    public void deleteProfileimg(Long id) {
-        User user =userRepository.findById(id).orElseThrow();
+    public void deleteProfileimg(String email) {
+        User user =userRepository.findByEmail(email).orElseThrow();
         user.setProfileimgPath("");
         userRepository.save(user);
     }

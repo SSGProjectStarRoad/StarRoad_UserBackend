@@ -19,17 +19,17 @@ public class CouponController {
     @PostMapping("/issue")
     public ResponseEntity<Integer> issueCoupon(@RequestBody IssueCouponRequest request) {
 
-        if (request.getUserId() == null || request.getCouponId() == null) {
+        if (request.getUserEmail() == null || request.getCouponId() == null) {
             return ResponseEntity.badRequest().body(0);
         }
 
-        int rate = couponHistoryService.CouponUserAdd(request.getUserId(), request.getCouponId());
+        int rate = couponHistoryService.CouponUserAdd(request.getUserEmail(), request.getCouponId());
 
         return ResponseEntity.ok(rate);
     }
-    @GetMapping("/{userId}/coupon/list")
-    public ResponseEntity<List<CouponDTO>> getUserCoupons(@PathVariable Long userId) {
-        List<CouponDTO> coupons = couponHistoryService.CouponsUserList(userId);
+    @GetMapping("/{email}/coupon/list")
+    public ResponseEntity<List<CouponDTO>> getUserCoupons(@PathVariable String email) {
+        List<CouponDTO> coupons = couponHistoryService.CouponsUserList(email);
         if (coupons.isEmpty()) {
             return ResponseEntity.noContent().build();  // 내용이 없을 경우 No Content (204) 반환
         }

@@ -13,7 +13,5 @@ public class MypageDTO {
     private String profileImg;
     private int reviewExp;
     private String name;
-    private int following;
-    private int follower;
     private int point;
 }

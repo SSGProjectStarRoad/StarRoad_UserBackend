@@ -19,9 +19,9 @@ import java.util.List;
 public class RewardHistoryController {
     private final RewardHistoryService rewardHistoryService;
 
-    @GetMapping("/user/{userId}/list")
-    public ResponseEntity<List<RewardHistoryDTO>> getRewardHistory(@PathVariable("userId") Long userId) {
-        List<RewardHistoryDTO> rewardHistoryDTOList = rewardHistoryService.getRewardHistory(userId);
+    @GetMapping("/user/{email}/list")
+    public ResponseEntity<List<RewardHistoryDTO>> getRewardHistory(@PathVariable("email") String email) {
+        List<RewardHistoryDTO> rewardHistoryDTOList = rewardHistoryService.getRewardHistory(email);
         if (rewardHistoryDTOList.isEmpty()) {
             return ResponseEntity.noContent().build();  // 내용이 없을 경우 No Content (204) 반환
         }

@@ -34,9 +34,9 @@ public class CouponHistorySeviceTest {
         couponHistoryService.CouponUsageModify(2L);
         log.info("coupon status: {} ",couponHistoryRepository.findById(2L));
     }
-    @Test
-    public void testgetCouponsByUserID(){
-        log.info("user coupons:{}",couponHistoryService.CouponsUserList(4L));
-    }
+//    @Test
+//    public void testgetCouponsByUserID(){
+//        log.info("user coupons:{}",couponHistoryService.CouponsUserList(4L));
+//    }
 
 }

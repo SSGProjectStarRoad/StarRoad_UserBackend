@@ -10,6 +10,7 @@ import com.ssg.starroad.common.service.S3Uploader;
 import com.ssg.starroad.user.dto.MypageDTO;
 import com.ssg.starroad.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -133,9 +134,18 @@ public class UserController {
         String email = logoutRequest.getEmail();
         String accessToken = logoutRequest.getAccessToken();
 
+        // 로그 추가
+        System.out.println("Logout request received");
+        System.out.println("Email: " + email);
+        System.out.println("Access token: " + accessToken);
+
         if (tokenProvider.validToken(accessToken)) {
             // 이메일과 토큰으로 사용자 인증 및 토큰 무효화 로직 추가
             refreshTokenRepository.deleteByUserEmail(email);
+            System.out.println("Token is valid. Proceeding with logout.");
+        }else {
+            System.out.println("Invalid token.");
+            return ResponseEntity.status(HttpServletResponse.SC_UNAUTHORIZED).body("Invalid token");
         }
         // 세션 무효화
         request.getSession().invalidate();
@@ -156,35 +166,35 @@ public class UserController {
 
 
 
-    @GetMapping("/mypage/{userId}")
-    public ResponseEntity<MypageDTO> getMypage(@PathVariable Long userId) {
-        MypageDTO mypageDTO=userService.getMypage(userId);
+    @GetMapping("/mypage/{email}")
+    public ResponseEntity<MypageDTO> getMypage(@PathVariable String email) {
+        MypageDTO mypageDTO=userService.getMypage(email);
         if (mypageDTO==null) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(mypageDTO);
     }
 
-    @PostMapping("/profile/upload/img/{userId}")
-    public ResponseEntity<?> uploadImg(@PathVariable Long userId, @RequestParam("file") MultipartFile uploadImg) {
+    @PostMapping("/profile/upload/img/{email}")
+    public ResponseEntity<?> uploadImg(@PathVariable String email, @RequestParam("file") MultipartFile uploadImg) {
         String path = s3Uploader.upload(uploadImg,"ssg/user/profile");
-        userService.saveProfileimg(userId,path);
+        userService.saveProfileimg(email,path);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/profile/get/img/{userId}")
-    public ResponseEntity<?> getImg(@PathVariable Long userId)
+    @GetMapping("/profile/get/img/{email}")
+    public ResponseEntity<?> getImg(@PathVariable String email)
     {
-        String path =userService.getProfileimg(userId);
+        String path =userService.getProfileimg(email);
         if (path==null) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(path.trim());
     }
 
-    @DeleteMapping("/profile/delete/img/{userId}")
-    public ResponseEntity<?> deleteImg(@PathVariable Long userId){
-        userService.deleteProfileimg(userId);
+    @DeleteMapping("/profile/delete/img/{email}")
+    public ResponseEntity<?> deleteImg(@PathVariable String email){
+        userService.deleteProfileimg(email);
         return ResponseEntity.ok().build();
     }
 }

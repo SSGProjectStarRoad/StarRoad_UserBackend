@@ -15,10 +15,10 @@ public class RewardProcessController {
     private final RewardProcessService rewardProcessService;
 
 
-    @GetMapping("/{userId}/start")
-    public ResponseEntity<?> startRewardProcess(@PathVariable Long userId) {
+    @GetMapping("/{email}/start")
+    public ResponseEntity<?> startRewardProcess(@PathVariable String email) {
         // 여기서 userId와 DTO를 이용하여 처리 로직 호출
-        rewardProcessService.startRewardProcess(userId);
+        rewardProcessService.startRewardProcess(email);
         return ResponseEntity.ok().build();
     }
 
@@ -32,38 +32,38 @@ public class RewardProcessController {
         }
     }
 
-    @PatchMapping("/{userId}/review")
-    public ResponseEntity<?> updateReviewCount(@PathVariable Long userId) {
+    @PatchMapping("/{email}/review")
+    public ResponseEntity<?> updateReviewCount(@PathVariable String email) {
         try {
-            rewardProcessService.updateReviewCount(userId);
+            rewardProcessService.updateReviewCount(email);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error updating review count: " + e.getMessage());
         }
     }
 
-    @PatchMapping("/{userId}/completed")
-    public ResponseEntity<?> updateStatus(@PathVariable Long userId) {
+    @PatchMapping("/{email}/completed")
+    public ResponseEntity<?> updateStatus(@PathVariable String email) {
         try {
-            rewardProcessService.updateStatus(userId);
+            rewardProcessService.updateStatus(email);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error updating status: " + e.getMessage());
         }
     }
-    @PatchMapping("/{userId}/new")
-    public ResponseEntity<?> resetStatus(@PathVariable Long userId) {
+    @PatchMapping("/{email}/new")
+    public ResponseEntity<?> resetStatus(@PathVariable String email) {
         try {
-            rewardProcessService.resetStatus(userId);
+            rewardProcessService.resetStatus(email);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error updating status: " + e.getMessage());
         }
     }
 
-    @GetMapping("/{userId}/get")
-    public ResponseEntity<?> getProcess(@PathVariable("userId") Long userId){
-        RewardProcessDTO rewardProcessDTO=rewardProcessService.getProcess(userId);
+    @GetMapping("/{email}/get")
+    public ResponseEntity<?> getProcess(@PathVariable("email") String email){
+        RewardProcessDTO rewardProcessDTO=rewardProcessService.getProcess(email);
         if (rewardProcessDTO==null) {
             return ResponseEntity.noContent().build();
         }

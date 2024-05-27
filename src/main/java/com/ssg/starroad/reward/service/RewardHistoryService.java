@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface RewardHistoryService {
     public void addReward(RewardMemberDTO rewardmemberDTO);
-    public List<RewardHistoryDTO> getRewardHistory(Long userId);
+    public List<RewardHistoryDTO> getRewardHistory(String email);
 }

@@ -26,7 +26,7 @@ public class RewardHistoryServiceImpl implements RewardHistoryService {
 
     @Override
     public void addReward(RewardMemberDTO rewardmemberDTO) {
-        Optional<User> user=userRepository.findById(rewardmemberDTO.getMemberId());
+        Optional<User> user=userRepository.findByEmail(rewardmemberDTO.getEmail());
 
         user.ifPresent(value -> rewardHistoryRepository.save(RewardHistory.builder()
                 .rewardId(rewardmemberDTO.getRewardId())
@@ -34,7 +34,8 @@ public class RewardHistoryServiceImpl implements RewardHistoryService {
     }
 
     @Override
-    public List<RewardHistoryDTO> getRewardHistory(Long userId) {
+    public List<RewardHistoryDTO> getRewardHistory(String email) {
+        Long userId = userRepository.findByEmail(email).orElseThrow().getId();
         List<Tuple> rewardCounts = rewardHistoryRepositoryCustom.countRewardHistoryByUserId(userId);
         List<RewardHistoryDTO> result = new ArrayList<>();
 

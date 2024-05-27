@@ -17,29 +17,29 @@ public class FollowController {
 
     private final FollowService followService;
 
-    @GetMapping("/mycount/{userId}")
-    public ResponseEntity<FollowCountDTO> getCountByFromUserId(@PathVariable Long userId) {
-        long followerCount = followService.getCountByFromUserId(userId);
-        long followingCount = followService.getCountByToUserId(userId);
+    @GetMapping("/mycount/{email}")
+    public ResponseEntity<FollowCountDTO> getCountByFromUserId(@PathVariable String email) {
+        long followerCount = followService.getCountByFromUserId(email);
+        long followingCount = followService.getCountByToUserId(email);
         FollowCountDTO followCountDTO = new FollowCountDTO(followerCount, followingCount);
         return ResponseEntity.ok(followCountDTO);
     }
 
-    @GetMapping("/from/{userId}")
-    public ResponseEntity<List<FollowDTO>> getFollowsByFromUserId(@PathVariable Long userId) {
-        List<FollowDTO> follows = followService.getFollowsByFromUserId(userId);
+    @GetMapping("/from/{email}")
+    public ResponseEntity<List<FollowDTO>> getFollowsByFromUserId(@PathVariable String email) {
+        List<FollowDTO> follows = followService.getFollowsByFromUserId(email);
         return ResponseEntity.ok(follows);
     }
 
-    @GetMapping("/to/{userId}")
-    public ResponseEntity<List<FollowDTO>> getFollowsByToUserId(@PathVariable Long userId) {
-        List<FollowDTO> follows = followService.getFollowsByToUserId(userId);
+    @GetMapping("/to/{email}")
+    public ResponseEntity<List<FollowDTO>> getFollowsByToUserId(@PathVariable String email) {
+        List<FollowDTO> follows = followService.getFollowsByToUserId(email);
         return ResponseEntity.ok(follows);
     }
 
-    @DeleteMapping("/{id}/deletefrom/{userId}")
-    public ResponseEntity<Void> deleteFollowingUser(@PathVariable Long userId, @PathVariable Long id) {
-        followService.deleteFollowingUser(userId, id);
+    @DeleteMapping("/{id}/deletefrom/{email}")
+    public ResponseEntity<Void> deleteFollowingUser(@PathVariable String email, @PathVariable Long id) {
+        followService.deleteFollowingUser(email, id);
         return ResponseEntity.noContent().build();
     }
 

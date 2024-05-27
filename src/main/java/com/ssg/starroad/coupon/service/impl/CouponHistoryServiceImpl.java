@@ -34,17 +34,18 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
     private final RewardProcessRepository rewardProcessRepository;
 
     @Override
-    public int CouponUserAdd(Long userID, Long couponID) {
+    public int CouponUserAdd(String email, Long couponID) {
         Coupon coupon = couponRepository.findById(couponID).orElseThrow();
         int max = coupon.getMaxAmount();
         int min = coupon.getMinAmount();
         int rate = ThreadLocalRandom.current().nextInt(min, max + 1);
 
         CouponHistory couponHistory =
-                new CouponHistory(null, userRepository.findById(userID).orElseThrow(),
+                new CouponHistory(null, userRepository.findByEmail(email).orElseThrow(),
                         couponID,false, LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY)),rate);
         couponHistoryRepository.save(couponHistory);
 
+        Long userID = userRepository.findByEmail(email).orElseThrow().getId();
         RewardProcess rewardProcess =rewardProcessRepository.findById(userID).orElseThrow();
         rewardProcess.setIssueStatus(true);
         rewardProcessRepository.save(rewardProcess);
@@ -76,7 +77,8 @@ public class CouponHistoryServiceImpl implements CouponHistoryService {
     }
 
     @Override
-    public List<CouponDTO> CouponsUserList(Long userID) {
+    public List<CouponDTO> CouponsUserList(String email) {
+        Long userID = userRepository.findByEmail(email).orElseThrow().getId();
         List<CouponDTO> coupons = couponHistoryRepositoryCustom.findCouponsByUserId(userID);
         LocalDate today = LocalDate.now();
 

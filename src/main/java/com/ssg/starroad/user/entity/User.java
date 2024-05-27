@@ -93,6 +93,8 @@ public class User extends BaseTimeEntity implements UserDetails, OAuth2User {
         return this.providerId; // providerId를 반환
     }
 
+    public String getUserName() {return this.name;}
+
     // 제네릭 타입 A를 사용하여, OAuth2User 인터페이스에서
     // 다양한 타입의 사용자 속성을 안전하게 가져오도록 설계(필수)
     // String email = user.getAttribute("email")과 같이 사용할 때

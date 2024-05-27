@@ -35,6 +35,9 @@ public class StoreServiceImpl implements StoreService {
     private final ReviewImageService reviewImageService; // ReviewImageService 인젝션
     private final ReviewFeedbackService reviewFeedbackService;
     private final ReviewService reviewService;
+
+
+
     private final ReviewLikeRepository reviewLikeRepository;
     private final UserRepository userRepository;
     @Override
@@ -49,19 +52,31 @@ public class StoreServiceImpl implements StoreService {
         return storeDTOList;
     }
     @Override
-    public StoreWithReviewDTO findStoreWithReview(Long storeId, String userEmail, int pageNo, int pageSize) {
+    public StoreWithReviewDTO findStoreWithReview(Long storeId, String userEmail, int pageNo, int pageSize,String filter) {
+        // 주어진 storeId로 스토어를 조회합니다.
         Store store = storeRepository.findById(storeId).orElseThrow(() -> new RuntimeException("존재하지 않는 스토어입니다."));
-
+        // 페이지 요청 객체를 생성합니다.
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Review> reviewPage = reviewRepository.findAllWithPageByStoreId(storeId, pageable);
 
+        // 스토어 ID와 필터 조건에 따라 리뷰 페이지를 조회합니다.
+        Page<Review> reviewPage;
+        if (filter == null || filter.isEmpty()) {
+            // 필터가 없으면 모든 리뷰를 조회합니다.
+            reviewPage = reviewRepository.findAllWithPageByStoreId(storeId, pageable);
+        } else {
+            // 필터가 있으면 필터 조건에 맞는 리뷰만 조회합니다.
+            reviewPage = reviewRepository.findAllWithPageByStoreIdAndReviewFeedbackSelection(storeId, filter, pageable);
+        }
+        // 스토어 ID로 전체 리뷰 개수를 조회합니다.
         Long totalReviewCount = reviewRepository.countByStoreId(storeId);
+
+        // 특정 피드백을 받은 리뷰 개수를 조회합니다.(4개// 필수 선택지 )
         long revisitCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(storeId, "재방문 하고 싶어요");
         long serviceSatisfactionCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(storeId, "서비스가 마음에 들어요");
         long reasonablePriceCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(storeId, "가격이 합리적입니다");
         long cleanlinessCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(storeId, "매장이 청결합니다");
 
-        // 사용자 이메일을 통해 좋아요 상태 확인
+        // 사용자 이메일을 통해 사용자 ID를 조회합니다.
         Long userId = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.")).getId();
 //        List<Long> likedReviewIds = reviewLikeRepository.findLikedReviewIdsByUserId(userId);
 
@@ -128,18 +143,18 @@ public class StoreServiceImpl implements StoreService {
                 .storeGuideMap(store.getStoreGuideMap())
                 .name(store.getName())
                 .floor(store.getFloor().getFloor())
-                        .build();
+                .build();
 
 
 
 
         return storeDTO;
     }
-
     @Override
     // 매장 이름을 이용해 매장을 조회하고 매장 유형을 반환하는 메소드
     public String findStoreTypeByName(String name) {
         Store store = storeRepository.findByName(name).orElseThrow(() -> new RuntimeException("존재하지 않는 스토어입니다."));
         return store.getStoreType();
     }
+
 }

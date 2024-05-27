@@ -3,6 +3,7 @@ package com.ssg.starroad.config.jwt;
 // JwtProperties 클래스에서 설정된 값을 사용하여 토큰을 관리
 
 import com.ssg.starroad.user.entity.User;
+import io.jsonwebtoken.Jws;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -56,16 +57,22 @@ public class TokenProvider {
     }
 
     // 제공된 토큰이 유효한지 검사. 토큰의 서명 검증. 파싱 중 발생할 수 있는 예외 처리
-    // 예외가 발생하면 false 그렇지 않으면 true
+// 예외가 발생하면 false 그렇지 않으면 true
     public boolean validToken(String token) {
         try {
             SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtProperties.getSecretKey()));
-            Jwts.parserBuilder()
-                    .setSigningKey(key)// 비밀값으로 복호화
+            Jws<Claims> claimsJws = Jwts.parserBuilder()
+                    .setSigningKey(key)
                     .build()
                     .parseClaimsJws(token);
-            return true;
-        } catch (Exception e) { // 복호화 과정에서 에러가 나면 유효하지 않은 토큰
+
+            Claims claims = claimsJws.getBody();
+            Date expiration = claims.getExpiration();
+            System.out.println("Token expiration time: " + expiration);
+
+            return !expiration.before(new Date());
+        } catch (Exception e) {
+            System.out.println("Invalid token: " + e.getMessage());
             return false;
         }
     }

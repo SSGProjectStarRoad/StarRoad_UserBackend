@@ -54,7 +54,6 @@ public class ReviewLikeServiceImpl implements ReviewLikeService {
             review.setLikeCount(review.getLikeCount() + 1);
             isLiked = true;
         }
-        reviewRepository.save(review); // 변경된 likeCount를 저장
 
         return ReviewLikeDTO.builder()
                 .isLiked(isLiked)

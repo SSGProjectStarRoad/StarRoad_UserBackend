@@ -129,8 +129,14 @@ public class UserServiceImpl implements UserService {
     }
 
     public MypageDTO getMypage(String email) {
-        Long id = userRepository.findByEmail(email).orElseThrow().getId();
-        return userRepository.findById(id).map(info -> modelMapper.map(info, MypageDTO.class)).orElse(null);
+        User user = userRepository.findByEmail(email).orElseThrow();
+        return MypageDTO.builder()
+                .nickname(user.getNickname())
+                .profileImg(user.getImagePath())
+                .reviewExp(user.getReviewExp())
+                .name(user.getUserName())
+                .point(user.getPoint())
+                .build();
     }
 
     @Override

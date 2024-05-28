@@ -22,4 +22,6 @@ public class RewardHistoryDTO {
     @JsonProperty("reward_count")
     private Long count;
 
+    @JsonProperty("reward_image_path")
+    private String rewardImagePath;
 }

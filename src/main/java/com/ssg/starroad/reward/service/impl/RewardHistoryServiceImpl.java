@@ -44,6 +44,7 @@ public class RewardHistoryServiceImpl implements RewardHistoryService {
                     .rewardId(record.get(0, Long.class))
                     .rewardName(record.get(1, String.class))
                     .count(Objects.requireNonNull(record.get(2, Long.class)))
+                    .rewardImagePath(record.get(3,String.class))
                     .build();
             result.add(dto);
         }

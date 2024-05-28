@@ -57,7 +57,7 @@ public class TokenProvider {
     }
 
     // 제공된 토큰이 유효한지 검사. 토큰의 서명 검증. 파싱 중 발생할 수 있는 예외 처리
-    // 예외가 발생하면 false 그렇지 않으면 true
+// 예외가 발생하면 false 그렇지 않으면 true
     public boolean validToken(String token) {
         try {
             SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtProperties.getSecretKey()));

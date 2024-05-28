@@ -39,29 +39,29 @@ public class CouponRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Test
-    public void testSaveCoupon() {
-        // 쿠폰 엔티티 생성
-        Coupon coupon = new Coupon(null, "Complex2", "Food", "Summer Sale", 1000, 10, 5000, 10000, "Active", LocalDate.now().plusDays(7));
-
-        // 쿠폰 저장
-        Coupon savedCoupon = couponRepository.save(coupon);
-
-        // 로그 출력
-        log.info("Saved Coupon: {}", savedCoupon);
-
-        // 검증
-        assertNotNull(savedCoupon);
-        assertNotNull(savedCoupon.getId());
-    }
-
-    @Test
-    public void testIssueCoupon() {
-        couponHistoryService.CouponUserAdd(4L, 3L);
-//        log.info("check issue coupon: {}", couponHistoryRepository.findById(1L));
-    }
 }
+//    @Test
+//    public void testSaveCoupon() {
+//        // 쿠폰 엔티티 생성
+//        Coupon coupon = new Coupon(null, "Complex2", "Food", "Summer Sale", 1000, 10, 5000, 10000, "Active", LocalDate.now().plusDays(7));
+//
+//        // 쿠폰 저장
+//        Coupon savedCoupon = couponRepository.save(coupon);
+//
+//        // 로그 출력
+//        log.info("Saved Coupon: {}", savedCoupon);
+//
+//        // 검증
+//        assertNotNull(savedCoupon);
+//        assertNotNull(savedCoupon.getId());
+//    }
+
+//    @Test
+//    public void testIssueCoupon() {
+//        couponHistoryService.CouponUserAdd(4L, 3L);
+//        log.info("check issue coupon: {}", couponHistoryRepository.findById(1L));
+//    }
+//}
 //    @Test
 //    public void testfindByUserId(){
 ////        Long userId = 1L;

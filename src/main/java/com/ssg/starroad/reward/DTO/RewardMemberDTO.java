@@ -9,8 +9,8 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class RewardMemberDTO {
-    @JsonProperty("member_id")
-    private Long memberId;
+    @JsonProperty("member_email")
+    private String email;
 
     @JsonProperty("reward_id")
     private Long rewardId;

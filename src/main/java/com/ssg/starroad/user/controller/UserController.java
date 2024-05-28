@@ -164,35 +164,35 @@ public class UserController {
 
 
 
-    @GetMapping("/mypage/{userId}")
-    public ResponseEntity<MypageDTO> getMypage(@PathVariable Long userId) {
-        MypageDTO mypageDTO=userService.getMypage(userId);
+    @GetMapping("/mypage/{email}")
+    public ResponseEntity<MypageDTO> getMypage(@PathVariable String email) {
+        MypageDTO mypageDTO=userService.getMypage(email);
         if (mypageDTO==null) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(mypageDTO);
     }
 
-    @PostMapping("/profile/upload/img/{userId}")
-    public ResponseEntity<?> uploadImg(@PathVariable Long userId, @RequestParam("file") MultipartFile uploadImg) {
+    @PostMapping("/profile/upload/img/{email}")
+    public ResponseEntity<?> uploadImg(@PathVariable String email, @RequestParam("file") MultipartFile uploadImg) {
         String path = s3Uploader.upload(uploadImg,"ssg/user/profile");
-        userService.saveProfileimg(userId,path);
+        userService.saveProfileimg(email,path);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/profile/get/img/{userId}")
-    public ResponseEntity<?> getImg(@PathVariable Long userId)
+    @GetMapping("/profile/get/img/{email}")
+    public ResponseEntity<?> getImg(@PathVariable String email)
     {
-        String path =userService.getProfileimg(userId);
+        String path =userService.getProfileimg(email);
         if (path==null) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(path.trim());
     }
 
-    @DeleteMapping("/profile/delete/img/{userId}")
-    public ResponseEntity<?> deleteImg(@PathVariable Long userId){
-        userService.deleteProfileimg(userId);
+    @DeleteMapping("/profile/delete/img/{email}")
+    public ResponseEntity<?> deleteImg(@PathVariable String email){
+        userService.deleteProfileimg(email);
         return ResponseEntity.ok().build();
     }
 }

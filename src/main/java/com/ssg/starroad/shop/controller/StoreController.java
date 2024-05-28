@@ -32,15 +32,22 @@ public class StoreController {
     @GetMapping("/{id}/reviews")
     public ResponseEntity<StoreWithReviewDTO> StoreGetWithReviewById(
             @PathVariable Long id,
+            @RequestParam String userEmail,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String filter) {
         try {
-            StoreWithReviewDTO storeWithReviewDTO = storeService.findStoreWithReview(id, page, size);
+
+            String test = "choijh9023@naver.com";
+            log.info("Received request for store ID: {}, userEmail: {}, page: {}, size: {}, filter: ", id, test, page, size,filter);
+            StoreWithReviewDTO storeWithReviewDTO = storeService.findStoreWithReview(id, test, page, size,filter);
             return ResponseEntity.ok(storeWithReviewDTO);
         } catch (RuntimeException e) {
+            log.error("리뷰가 있는 상점을 가져오는데 실패했습니다", e);
             return ResponseEntity.notFound().build();
         }
     }
+
     // 특정 매장의 가이드 맵을 조회하는 요청을 처리하는 메소드입니다.
     @GetMapping("/{id}/guidemap")
     public ResponseEntity<StoreDTO> StoreGetGuidemapById(@PathVariable Long id) {
@@ -49,8 +56,6 @@ public class StoreController {
             // 매장 서비스를 통해 특정 매장의 가이드 맵을 조회합니다.
             StoreDTO storeDTO = storeService.findStore(id);
             // 조회된 가이드 맵을 응답으로 반환합니다.
-
-
             log.info(storeDTO.toString());
             return ResponseEntity.ok(storeDTO);
         } catch (RuntimeException e) {

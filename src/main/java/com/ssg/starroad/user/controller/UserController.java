@@ -10,6 +10,7 @@ import com.ssg.starroad.common.service.S3Uploader;
 import com.ssg.starroad.user.dto.MypageDTO;
 import com.ssg.starroad.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,8 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -133,9 +132,18 @@ public class UserController {
         String email = logoutRequest.getEmail();
         String accessToken = logoutRequest.getAccessToken();
 
+        // 로그 추가
+        System.out.println("Logout request received");
+        System.out.println("Email: " + email);
+        System.out.println("Access token: " + accessToken);
+
         if (tokenProvider.validToken(accessToken)) {
             // 이메일과 토큰으로 사용자 인증 및 토큰 무효화 로직 추가
             refreshTokenRepository.deleteByUserEmail(email);
+            System.out.println("Token is valid. Proceeding with logout.");
+        }else {
+            System.out.println("Invalid token.");
+            return ResponseEntity.status(HttpServletResponse.SC_UNAUTHORIZED).body("Invalid token");
         }
         // 세션 무효화
         request.getSession().invalidate();
@@ -153,7 +161,7 @@ public class UserController {
         return ResponseEntity.ok("User deactivated successfully");
 
     }
-}
+
 
 
     @GetMapping("/mypage/{userId}")

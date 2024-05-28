@@ -32,6 +32,7 @@ public class ReviewDTO {
     private List<ReviewImageDTO> reviewImages; // 리뷰 이미지 리스트 추가
     private List<ReviewFeedbackDTO> reviewFeedbacks; // 리뷰 피드백 추가
     private Long reviewcount; // 리뷰 갯수
+    private boolean isLiked;  // 내가 추가한 필드 choims 24/05/23
     private LocalDateTime createDate;
     @Enumerated(EnumType.STRING)
     private ConfidenceType confidence;

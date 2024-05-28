@@ -61,6 +61,9 @@ public class WebSecurityConfig{
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/user/login","/user/logout","/user/join/**","/oauth2/**","/api/token/**","/auth/**").permitAll()
+                        .requestMatchers("/api/oauth2/**").permitAll()
+                        .requestMatchers("/review-likes/**").permitAll()
+                        .requestMatchers("/store/**").permitAll()
                         .requestMatchers("/user/update-profile","/user/update-password","/user/details","/user/inactive").authenticated()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth -> oauth

@@ -29,12 +29,8 @@ public class RewardProcessServiceImpl implements RewardProcessService {
     public void startRewardProcess(String email) {
         Long userId = userRepository.findByEmail(email).orElseThrow().getId();
         RewardProcess rewardProcess = rewardProcessRepository.findById(userId)
-                .orElse(new RewardProcess(userId));  // 존재하지 않는 경우 새 객체 생성
-
-        rewardProcess.setRewardStatus(false);  // 기존 로직대로 상태 설정
-        rewardProcess.setExpiredAt(LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY)));
-        rewardProcess.setReviewCount(0);
-        rewardProcess.setCouponCount(0);
+                .orElseThrow();  // 존재하지 않는 경우 새 객체 생성
+        rewardProcess.setCouponCount(rewardProcess.getCouponCount()+1);
         rewardProcessRepository.save(rewardProcess);  // 저장
     }
 
@@ -81,8 +77,19 @@ public class RewardProcessServiceImpl implements RewardProcessService {
     @Transactional
     public RewardProcessDTO getProcess(String email){
         Long userId = userRepository.findByEmail(email).orElseThrow().getId();
-        RewardProcess rewardProcess = rewardProcessRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user ID: " + userId));
+        RewardProcess rewardProcess = rewardProcessRepository.findById(userId).orElseGet(() -> {
+            // RewardProcess가 존재하지 않을 경우 새로운 보상 프로세스를 생성합니다.
+            RewardProcess newRewardProcess = new RewardProcess();
+            newRewardProcess.setUserId(userId);
+            newRewardProcess.setCouponCount(0);
+            newRewardProcess.setReviewCount(0);
+            newRewardProcess.setIssueStatus(false);
+            newRewardProcess.setUsageStatus(false);
+            newRewardProcess.setRewardStatus(false);
+            newRewardProcess.setExpiredAt(LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY))); // 예시로 만료일을 7일 후로 설정
+            return rewardProcessRepository.save(newRewardProcess);
+        });
+
         if(Objects.equals(rewardProcess.getExpiredAt(), LocalDate.now()))
         {
            rewardProcessRepository.delete(rewardProcess);

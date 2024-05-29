@@ -29,4 +29,6 @@ public interface ReviewService {
     ResponseReviewDTO findAllReview(int pageNo, int pageSize);
 
     ResponseReviewDTO findFollowingReview(Long id, int pageNo, int pageSize);
+
+    ResponseReviewDTO getUserReview(String email,int pageNo, int pageSize);
 }

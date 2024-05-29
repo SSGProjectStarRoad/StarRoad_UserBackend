@@ -1,6 +1,7 @@
 package com.ssg.starroad.user.controller;
 
 
+import com.ssg.starroad.common.util.CookieUtil;
 import com.ssg.starroad.config.jwt.TokenProvider;
 import com.ssg.starroad.user.dto.*;
 import com.ssg.starroad.user.entity.User;
@@ -34,6 +35,7 @@ public class UserController {
     private final RefreshTokenService refreshTokenService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final S3Uploader s3Uploader;
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         boolean isValidUser = userService.validateUser(request.getEmail(), request.getPassword());
@@ -54,8 +56,9 @@ public class UserController {
 
             LoginResponse loginResponse = new LoginResponse(accessToken, refreshToken,"환영합니다!");
             return ResponseEntity.ok().headers(headers).body(loginResponse);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginResponse("이메일 또는 비밀번호를 잘못 입력했습니다"));
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginResponse("Invalid credentials"));
     }
 
     @PostMapping("/join/email-check")
@@ -128,7 +131,7 @@ public class UserController {
 
     @Transactional
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest, HttpServletRequest request) {
+    public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest, HttpServletRequest request, HttpServletResponse response) {
         String email = logoutRequest.getEmail();
         String accessToken = logoutRequest.getAccessToken();
 
@@ -147,6 +150,10 @@ public class UserController {
         }
         // 세션 무효화
         request.getSession().invalidate();
+
+        // JSESSIONID 쿠키 삭제
+        CookieUtil.deleteCookie(request, response, "JSESSIONID");
+
 
         return ResponseEntity.ok().body("Logout successful");
     }

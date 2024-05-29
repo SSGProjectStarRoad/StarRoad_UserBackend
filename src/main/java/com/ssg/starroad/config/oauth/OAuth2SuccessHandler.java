@@ -69,6 +69,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             addCookie(response, REFRESH_TOKEN_COOKIE_NAME, refreshToken, REFRESH_TOKEN_EXPIRY);
             addCookie(response, ACCESS_TOKEN_COOKIE_NAME, accessToken, ACCESS_TOKEN_EXPIRY);
 
+            // 세션 무효화
+            request.getSession().invalidate();
+
             // 최종 목적지 URL로 리다이렉트
             String targetUrl = determineTargetUrl(request, response, authentication);
             clearAuthenticationAttributes(request);

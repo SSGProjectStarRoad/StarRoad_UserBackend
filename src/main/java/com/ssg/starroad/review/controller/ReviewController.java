@@ -1,19 +1,16 @@
 package com.ssg.starroad.review.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssg.starroad.common.service.S3Uploader;
-import com.ssg.starroad.review.DTO.*;
+import com.ssg.starroad.review.DTO.ResponseReviewDTO;
+import com.ssg.starroad.review.DTO.ReviewDTO;
+import com.ssg.starroad.review.DTO.ReviewReceiptDTO;
+import com.ssg.starroad.review.DTO.ReviewRequestDTO;
 import com.ssg.starroad.review.entity.Review;
-import com.ssg.starroad.review.entity.ReviewImage;
 import com.ssg.starroad.review.repository.ReviewImageRepository;
 import com.ssg.starroad.review.service.ReviewFeedbackService;
 import com.ssg.starroad.review.service.ReviewReceiptService;
 import com.ssg.starroad.review.service.ReviewService;
-import com.ssg.starroad.shop.entity.Store;
-import com.ssg.starroad.shop.repository.StoreRepository;
 import com.ssg.starroad.user.dto.RankUserDTO;
-import com.ssg.starroad.user.entity.User;
-import com.ssg.starroad.user.repository.UserRepository;
 import com.ssg.starroad.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @RequestMapping("/reviews")
@@ -33,11 +29,7 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final ReviewReceiptService reviewReceiptService;
     private final ReviewFeedbackService reviewFeedbackService;
-    private final StoreRepository storeRepository;
-    private final UserRepository userRepository;
-    private final S3Uploader s3Uploader;
     private final ReviewImageRepository imageRepository;
-    private final ReviewImageRepository reviewImageRepository;
     private final UserService userService;
 
 
@@ -107,48 +99,9 @@ public class ReviewController {
         // JSON 문자열을 ReviewDTO 객체로 변환합니다.
         ReviewDTO reviewDTO = new ObjectMapper().readValue(reviewStr, ReviewDTO.class);
 
-        System.out.println("reviewSelectionDTO toString : " + reviewDTO.toString());
+        ResponseEntity<String> result = reviewService.saveSurvey(reviewDTO, uploadedImages);
 
-        User user = userRepository.findBynickname(reviewDTO.getUserNickname()).orElseThrow(() -> new IllegalArgumentException("User not found for the nickname: " + reviewDTO.getUserNickname()));
-        // Store 엔티티가 아직 저장되지 않은 경우 저장
-        Store store = storeRepository.findByName(reviewDTO.getShopName()).orElseThrow(() -> new IllegalArgumentException("Store not found for the shop name: " + reviewDTO.getShopName()));
-        System.out.printf("Store Id : " + store.getId());
-        // Review 엔티티 생성 및 저장
-        Review savedReview = reviewService.createReview(Review.builder()
-                .user(user)
-                .store(store)
-                .paymentNum(reviewDTO.getPaymentNum())
-                .contents(reviewDTO.getContents())
-                .visible(true)
-                .likeCount(0L)
-                .build());
-        Long reviewId = savedReview.getId();
-
-        List<String> imageUrls = new ArrayList<>();
-        if (uploadedImages != null && !uploadedImages.isEmpty()) {
-            imageUrls = s3Uploader.upload(uploadedImages.toArray(new MultipartFile[uploadedImages.size()]), "ssg/reviews");
-        }
-
-        System.out.println("================================================================");
-        for (String imageUrl : imageUrls) {
-            System.out.println(imageUrl);
-        }
-
-        // surveyData를 합쳐서 ReviewFeedbackDTO 생성
-        String combinedSurveyData = reviewDTO.getCombinedSurveyData();
-        ReviewFeedbackDTO reviewFeedbackDTO = ReviewFeedbackDTO.builder()
-                .reviewId(reviewId)
-                .reviewFeedbackSelection(combinedSurveyData)
-                .build();
-
-        imageUrls.forEach(url -> reviewImageRepository.save(ReviewImage.builder()
-                .review(savedReview)
-                .imagePath(url)
-                .build()));
-
-        reviewFeedbackService.addReviewFeedback(reviewFeedbackDTO);
-
-        return ResponseEntity.ok("설문이 성공적으로 제출되었습니다!");
+        return result;
     }
 
     @GetMapping("/rank")

@@ -1,6 +1,7 @@
 package com.ssg.starroad.review.service;
 
 import com.ssg.starroad.review.DTO.ResponseReviewDTO;
+import com.ssg.starroad.review.DTO.ReviewDTO;
 import com.ssg.starroad.review.entity.Review;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,4 +28,8 @@ public interface ReviewService {
     ResponseReviewDTO findAllReview(String userEmail, int pageNo, int pageSize);
 
     ResponseReviewDTO findFollowingReview(String userEmail, int pageNo, int pageSize);
+
+    String makeSummary(String content);
+
+    ResponseEntity<String> saveSurvey(ReviewDTO reviewDTO, List<MultipartFile> uploadedImages);
 }

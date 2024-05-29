@@ -36,6 +36,7 @@ public class UserServiceImpl implements UserService {
     private final UrlBasedCorsConfigurationSource corsConfigurationSource;
     private final FollowRepository followRepository;
 
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Optional<User> userOptional = userRepository.findByEmail(email);
@@ -295,6 +296,7 @@ public class UserServiceImpl implements UserService {
         User toUser = toUserOpt.get();
 
         System.out.println("fromUser, toUser : " + fromUser + ", " + toUser);
+        System.out.println("toUser tostring : " + toUser.toString());
 
         Optional<Follow> existingFollow = followRepository.findByFromUserAndToUser(fromUser, toUser);
 

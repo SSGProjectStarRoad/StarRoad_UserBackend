@@ -1,6 +1,5 @@
 package com.ssg.starroad.review.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssg.starroad.common.service.S3Uploader;
 import com.ssg.starroad.review.DTO.*;
@@ -12,16 +11,19 @@ import com.ssg.starroad.review.service.ReviewReceiptService;
 import com.ssg.starroad.review.service.ReviewService;
 import com.ssg.starroad.shop.entity.Store;
 import com.ssg.starroad.shop.repository.StoreRepository;
+import com.ssg.starroad.user.dto.RankUserDTO;
 import com.ssg.starroad.user.entity.User;
 import com.ssg.starroad.user.repository.UserRepository;
+import com.ssg.starroad.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 @RequestMapping("/reviews")
 @RestController
@@ -36,6 +38,7 @@ public class ReviewController {
     private final S3Uploader s3Uploader;
     private final ReviewImageRepository imageRepository;
     private final ReviewImageRepository reviewImageRepository;
+    private final UserService userService;
 
 
     @PostMapping("/write")
@@ -67,12 +70,12 @@ public class ReviewController {
     }
 
 
-
     @GetMapping
-    public ResponseEntity<ResponseReviewDTO> getAllReviews(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<ResponseReviewDTO> getAllReviews(@RequestParam String userEmail,
+                                                           @RequestParam(defaultValue = "0") int page,
                                                            @RequestParam(defaultValue = "10") int size) {
         try {
-            ResponseReviewDTO responseReviewDTO = reviewService.findAllReview(page, size);
+            ResponseReviewDTO responseReviewDTO = reviewService.findAllReview(userEmail, page, size);
             return ResponseEntity.ok(responseReviewDTO);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
@@ -80,13 +83,13 @@ public class ReviewController {
     }
 
     @GetMapping("/following")
-    public ResponseEntity<ResponseReviewDTO> getFollowingReviews(@RequestParam Long id,
+    public ResponseEntity<ResponseReviewDTO> getFollowingReviews(@RequestParam String userEmail,
                                                                  @RequestParam(defaultValue = "0") int page,
                                                                  @RequestParam(defaultValue = "10") int size) {
-        System.out.printf("following 리뷰 메소드 진입");
+        System.out.printf("CReviewController::getFollowingReviews userEmail : %s\n", userEmail);
         try {
             System.out.printf("try문 실행");
-            ResponseReviewDTO responseReviewDTO = reviewService.findFollowingReview(id, page, size);
+            ResponseReviewDTO responseReviewDTO = reviewService.findFollowingReview(userEmail, page, size);
             return ResponseEntity.ok(responseReviewDTO);
         } catch (RuntimeException e) {
             System.out.printf(e.getMessage());
@@ -148,5 +151,28 @@ public class ReviewController {
         return ResponseEntity.ok("설문이 성공적으로 제출되었습니다!");
     }
 
+    @GetMapping("/rank")
+    public ResponseEntity<List<RankUserDTO>> getRankUser(@RequestParam String userEmail) {
+        List<RankUserDTO> rankUserDTOS = userService.getRankUser(userEmail);
+
+        return ResponseEntity.ok(rankUserDTOS);
+    }
+
+    @GetMapping("/allUser")
+    public ResponseEntity<List<RankUserDTO>> getAllUser(@RequestParam String userEmail) {
+        List<RankUserDTO> rankUserDTOS = userService.getAllUser(userEmail);
+
+        return ResponseEntity.ok(rankUserDTOS);
+    }
+
+    @PostMapping("/addFollowUser")
+    public ResponseEntity<String> getAllReviews(@RequestParam String userName,
+                                                @RequestParam String userEmail
+    ) {
+        System.out.printf("CReviewController getAllReviews userName : %s, userEmail : %s", userName, userEmail);
+        String followState = userService.addFollowUser(userName, userEmail);
+
+        return ResponseEntity.ok("팔로우 성공");
+    }
 }
 

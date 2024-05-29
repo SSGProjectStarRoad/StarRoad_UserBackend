@@ -6,12 +6,13 @@ import com.ssg.starroad.review.DTO.ReviewFeedbackDTO;
 import com.ssg.starroad.review.DTO.ReviewImageDTO;
 import com.ssg.starroad.review.entity.Review;
 import com.ssg.starroad.review.repository.ReviewFollowRepository;
+import com.ssg.starroad.review.repository.ReviewLikeRepository;
 import com.ssg.starroad.review.repository.ReviewRepository;
 import com.ssg.starroad.review.service.ReviewFeedbackService;
 import com.ssg.starroad.review.service.ReviewImageService;
 import com.ssg.starroad.review.service.ReviewService;
+import com.ssg.starroad.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,9 +41,12 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewFeedbackService reviewFeedbackService;
     private final ReviewFollowRepository reviewFollowRepository;
 
+    private final ReviewLikeRepository reviewLikeRepository;
+    private final UserRepository userRepository;
+
     @Override
     public Long countReviewsByUserId(Long userId) {
-        return    reviewRepository.countByUserId(userId);
+        return reviewRepository.countByUserId(userId);
     }
 
     @Override
@@ -128,12 +132,12 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public ResponseReviewDTO findAllReview(int pageNo, int pageSize) {
+    public ResponseReviewDTO findAllReview(String userEmail, int pageNo, int pageSize) {
         // 최신순으로 정렬된 Pageable 객체 생성
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
         // 정렬된 Pageable 객체를 사용하여 리뷰 페이지 가져오기
         Page<Review> reviewPage = reviewRepository.findAll(pageable);
-
+        Long userId = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.")).getId();
 //        Long totalReviewCount = reviewRepository.countByStoreId(id);
 
         List<ReviewDTO> reviewDTOList = reviewPage.stream()
@@ -141,6 +145,7 @@ public class ReviewServiceImpl implements ReviewService {
                     List<ReviewImageDTO> reviewImageDTOs = reviewImageService.getReviewImages(review.getId());
                     List<ReviewFeedbackDTO> reviewFeedbackDTOs = reviewFeedbackService.getReviewFeedback(review.getId());
                     Long userReviewCount = countReviewsByUserId(review.getUser().getId());
+                    boolean isLiked = reviewLikeRepository.existsByUser_IdAndReview_Id(userId, review.getId());
 
                     return ReviewDTO.builder()
                             .id(review.getId())
@@ -169,14 +174,18 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public ResponseReviewDTO findFollowingReview(Long id, int pageNo, int pageSize) {
+    public ResponseReviewDTO findFollowingReview(String userEmail, int pageNo, int pageSize) {
         // 최신순으로 정렬된 Pageable 객체 생성
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
         // 정렬된 Pageable 객체를 사용하여 리뷰 페이지 가져오기
 
-        List<Long> toUserIds = reviewFollowRepository.findToUserIdsByFromUserId(id);
+        // 사용자 이메일을 통해 사용자 ID를 조회합니다.
+        Long userId = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.")).getId();
+
+        List<Long> toUserIds = reviewFollowRepository.findToUserIdsByFromUserId(userId);
 
         Page<Review> reviewPage = reviewRepository.findAllByUserIds(toUserIds, pageable);
+
 
 //        Page<Review> reviewPage = reviewFollowRepository.findToUserIdsByFromUserId(id).stream().map(followId -> reviewRepository.findAllWithPageByUserId(followId, pageable)).toList().stream().findFirst().orElse(null);
 
@@ -185,7 +194,7 @@ public class ReviewServiceImpl implements ReviewService {
                     List<ReviewImageDTO> reviewImageDTOs = reviewImageService.getReviewImages(review.getId());
                     List<ReviewFeedbackDTO> reviewFeedbackDTOs = reviewFeedbackService.getReviewFeedback(review.getId());
                     Long userReviewCount = countReviewsByUserId(review.getUser().getId());
-
+                    boolean isLiked = reviewLikeRepository.existsByUser_IdAndReview_Id(userId, review.getId());
                     return ReviewDTO.builder()
                             .id(review.getId())
                             .userId(review.getUser().getId())
@@ -201,6 +210,7 @@ public class ReviewServiceImpl implements ReviewService {
                             .reviewcount(userReviewCount)
                             .reviewImages(reviewImageDTOs)
                             .reviewFeedbacks(reviewFeedbackDTOs)
+                            .isLiked(isLiked)
                             .build();
                 })
                 .collect(Collectors.toList());

@@ -1,24 +1,29 @@
 package com.ssg.starroad.user.service.impl;
 
 
+import com.ssg.starroad.user.dto.MypageDTO;
+import com.ssg.starroad.user.dto.RankUserDTO;
 import com.ssg.starroad.user.dto.UserDTO;
+import com.ssg.starroad.user.entity.Follow;
 import com.ssg.starroad.user.entity.User;
-import com.ssg.starroad.user.enums.ProviderType;
 import com.ssg.starroad.user.enums.ActiveStatus;
+import com.ssg.starroad.user.enums.ProviderType;
+import com.ssg.starroad.user.repository.FollowRepository;
 import com.ssg.starroad.user.repository.UserRepository;
 import com.ssg.starroad.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.ssg.starroad.user.dto.MypageDTO;
-import org.modelmapper.ModelMapper;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +33,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
+    private final UrlBasedCorsConfigurationSource corsConfigurationSource;
+    private final FollowRepository followRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -73,6 +80,7 @@ public class UserServiceImpl implements UserService {
                 .build();
         return userRepository.save(user).getId();
     }
+
     public boolean validateUser(String email, String password) {
 
         Optional<User> userOpt = userRepository.findByEmail(email);
@@ -142,7 +150,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void saveProfileimg(String email, String path) {
 
-        User user=userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow();
         user.setProfileimgPath(path);
         userRepository.save(user);
     }
@@ -189,14 +197,121 @@ public class UserServiceImpl implements UserService {
     }
 
     public String getProfileimg(String email) {
-        User user =userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow();
         return user.getImagePath();
     }
 
     @Override
     public void deleteProfileimg(String email) {
-        User user =userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow();
         user.setProfileimgPath("");
         userRepository.save(user);
+    }
+
+    @Override
+    public List<RankUserDTO> getRankUser(String email) {
+        List<User> users = userRepository.findAll();
+
+        Long id = findByEmail(email).get().getId();
+
+        // id 값과 동일한 값을 제외하고 나머지 사용자들 선택
+        List<User> filteredUsers = users.stream()
+                .filter(user -> !user.getId().equals(id))
+                .collect(Collectors.toList());
+
+        // reviewExp 필드를 기준으로 상위 3명의 사용자만 선택
+        List<User> topUsers = users.stream()
+                .sorted(Comparator.comparingInt(User::getReviewExp).reversed())
+                .limit(3)
+                .collect(Collectors.toList());
+
+        // 상위 3명의 사용자 목록을 출력 또는 다른 작업 수행
+        topUsers.forEach(System.out::println);
+
+        // User 객체를 RankUserDTO 객체로 변환
+        List<RankUserDTO> rankUserDTOS = topUsers.stream()
+                .map(user -> RankUserDTO.builder()
+                        .id(user.getId())
+                        .name(user.getName())
+                        .nickname(user.getNickname())
+                        .email(user.getEmail())
+                        .imagePath(user.getImagePath())
+                        .reviewExp(user.getReviewExp())
+                        .point(user.getPoint())
+                        .activeStatus(user.getActiveStatus())
+                        .build())
+                .collect(Collectors.toList());
+
+        return rankUserDTOS;
+    }
+
+    @Override
+    public List<RankUserDTO> getAllUser(String email) {
+        List<User> users = userRepository.findAll();
+
+        Long id = findByEmail(email).get().getId();
+
+        // id 값과 동일한 값을 제외하고 나머지 사용자들 선택
+        List<User> filteredUsers = users.stream()
+                .filter(user -> !user.getId().equals(id))
+                .collect(Collectors.toList());
+
+        // reviewExp 필드를 기준으로 상위 3명의 사용자만 선택
+        List<User> topUsers = users.stream()
+                .sorted(Comparator.comparingInt(User::getReviewExp).reversed())
+                .collect(Collectors.toList());
+
+        // 상위 3명의 사용자 목록을 출력 또는 다른 작업 수행
+        topUsers.forEach(System.out::println);
+
+        // User 객체를 RankUserDTO 객체로 변환
+        List<RankUserDTO> rankUserDTOS = topUsers.stream()
+                .map(user -> RankUserDTO.builder()
+                        .id(user.getId())
+                        .name(user.getName())
+                        .nickname(user.getNickname())
+                        .email(user.getEmail())
+                        .imagePath(user.getImagePath())
+                        .reviewExp(user.getReviewExp())
+                        .point(user.getPoint())
+                        .activeStatus(user.getActiveStatus())
+                        .build())
+                .collect(Collectors.toList());
+
+        return rankUserDTOS;
+    }
+
+
+    @Transactional
+    public String addFollowUser(String userName, String email) {
+        System.out.println("userName, email : " + userName + ", " + email);
+        Optional<User> fromUserOpt = userRepository.findByEmail(email);
+        Optional<User> toUserOpt = userRepository.findBynickname(userName);
+        System.out.println("fromUserOpt, toUserOpt : " + fromUserOpt + ", " + toUserOpt);
+        if (!fromUserOpt.isPresent() || !toUserOpt.isPresent()) {
+            return "유효하지 않은 사용자 정보입니다.";
+        }
+
+        User fromUser = fromUserOpt.get();
+        User toUser = toUserOpt.get();
+
+        System.out.println("fromUser, toUser : " + fromUser + ", " + toUser);
+
+        Optional<Follow> existingFollow = followRepository.findByFromUserAndToUser(fromUser, toUser);
+
+        // 기존 팔로우 관계가 존재하면 삭제, 그렇지 않으면 새로운 팔로우 관계 추가
+        if (existingFollow.isPresent()) {
+            System.out.println("해제 실행");
+            followRepository.delete(existingFollow.get());
+            return "팔로우 관계가 해제되었습니다.";
+        } else {
+            Follow newFollow = Follow.builder()
+                    .fromUser(fromUser)
+                    .toUser(toUser)
+                    .build();
+            System.out.println("저장 실행");
+            followRepository.save(newFollow);
+            return "새로운 팔로우 관계가 생성되었습니다.";
+        }
     }
 }

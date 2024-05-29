@@ -54,10 +54,20 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public StoreWithReviewDTO findStoreWithReview(Long storeId, String userEmail, int pageNo, int pageSize, String filter) {
+
         // 주어진 storeId로 스토어를 조회합니다.
         Store store = storeRepository.findById(storeId).orElseThrow(() -> new RuntimeException("존재하지 않는 스토어입니다."));
+
+        // 정렬 방식 설정
+        Sort sortOption;
+        if ("likes".equalsIgnoreCase(sort)) {
+            sortOption = Sort.by(Sort.Direction.DESC, "likeCount");
+        } else {
+            sortOption = Sort.by(Sort.Direction.DESC, "createdAt");
+        }
+
         // 페이지 요청 객체를 생성합니다.
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sortOption);
 
         // 스토어 ID와 필터 조건에 따라 리뷰 페이지를 조회합니다.
         Page<Review> reviewPage;
@@ -68,10 +78,11 @@ public class StoreServiceImpl implements StoreService {
             // 필터가 있으면 필터 조건에 맞는 리뷰만 조회합니다.
             reviewPage = reviewRepository.findAllWithPageByStoreIdAndReviewFeedbackSelection(storeId, filter, pageable);
         }
+
         // 스토어 ID로 전체 리뷰 개수를 조회합니다.
         Long totalReviewCount = reviewRepository.countByStoreId(storeId);
 
-        // 특정 피드백을 받은 리뷰 개수를 조회합니다.(4개// 필수 선택지 )
+        // 특정 피드백을 받은 리뷰 개수를 조회합니다.
         long revisitCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(storeId, "재방문 하고 싶어요");
         long serviceSatisfactionCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(storeId, "서비스가 마음에 들어요");
         long reasonablePriceCount = reviewRepository.countByStoreIdAndReviewFeedbackSelection(storeId, "가격이 합리적입니다");
@@ -79,14 +90,12 @@ public class StoreServiceImpl implements StoreService {
 
         // 사용자 이메일을 통해 사용자 ID를 조회합니다.
         Long userId = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.")).getId();
-//        List<Long> likedReviewIds = reviewLikeRepository.findLikedReviewIdsByUserId(userId);
 
         List<ReviewDTO> reviewDTOList = reviewPage.stream()
                 .map(review -> {
                     List<ReviewImageDTO> reviewImageDTOs = reviewImageService.getReviewImages(review.getId());
                     List<ReviewFeedbackDTO> reviewFeedbackDTOs = reviewFeedbackService.getReviewFeedback(review.getId());
                     Long userReviewCount = reviewService.countReviewsByUserId(review.getUser().getId());
-//                    boolean isLiked = likedReviewIds.contains(review.getId());
                     boolean isLiked = reviewLikeRepository.existsByUser_IdAndReview_Id(userId, review.getId());
 
                     return ReviewDTO.builder()

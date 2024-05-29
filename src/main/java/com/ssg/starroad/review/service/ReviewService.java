@@ -32,4 +32,6 @@ public interface ReviewService {
     String makeSummary(String content);
 
     ResponseEntity<String> saveSurvey(ReviewDTO reviewDTO, List<MultipartFile> uploadedImages);
+
+    ResponseReviewDTO getUserReview(String email,int pageNo, int pageSize);
 }

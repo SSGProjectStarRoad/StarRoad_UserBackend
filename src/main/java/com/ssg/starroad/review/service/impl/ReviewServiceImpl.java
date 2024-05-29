@@ -48,6 +48,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewImageService reviewImageService;
     private final ReviewFeedbackService reviewFeedbackService;
     private final ReviewFollowRepository reviewFollowRepository;
+    private final UserRepository userRepository;
 
     private final ReviewLikeRepository reviewLikeRepository;
     private final UserRepository userRepository;
@@ -369,5 +370,42 @@ public class ReviewServiceImpl implements ReviewService {
         reviewFeedbackService.addReviewFeedback(reviewFeedbackDTO);
 
         return ResponseEntity.ok("설문이 성공적으로 제출되었습니다!");
+
+    public ResponseReviewDTO getUserReview(String email,int pageNo, int pageSize){
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Long userId = userRepository.findByEmail(email).orElseThrow().getId();
+        Page<Review> reviewPage = reviewRepository.findAllByUserIds(Collections.singletonList(userId), pageable);
+
+        List<ReviewDTO> reviewDTOList = reviewPage.stream()
+                .map(review -> {
+                    List<ReviewImageDTO> reviewImageDTOs = reviewImageService.getReviewImages(review.getId());
+                    List<ReviewFeedbackDTO> reviewFeedbackDTOs = reviewFeedbackService.getReviewFeedback(review.getId());
+                    Long userReviewCount = countReviewsByUserId(review.getUser().getId());
+
+                    return ReviewDTO.builder()
+                            .id(review.getId())
+                            .userId(review.getUser().getId())
+                            .userNickname(review.getUser().getNickname())
+                            .imagePath(review.getUser().getImagePath())
+                            .storeId(review.getStore().getId())
+                            .visible(review.isVisible())
+                            .createDate(review.getCreatedAt())
+                            .likeCount(review.getLikeCount())
+                            .contents(review.getContents())
+                            .summary(review.getSummary())
+                            .confidence(review.getConfidence())
+                            .reviewcount(userReviewCount)
+                            .reviewImages(reviewImageDTOs)
+                            .reviewFeedbacks(reviewFeedbackDTOs)
+                            .build();
+                })
+                .collect(Collectors.toList());
+        return ResponseReviewDTO.builder()
+                .reviews(reviewDTOList)
+                .pageNumber(reviewPage.getNumber())
+                .pageSize(reviewPage.getSize())
+                .hasNext(reviewPage.hasNext())
+                .build();
+
     }
 }

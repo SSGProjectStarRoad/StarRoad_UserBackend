@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface StoreService {
 
+
     List<StoreDTO> searchStoreList(Long id);
 
     StoreWithReviewDTO findStoreWithReview(Long storeId, String userEmail, int pageNo, int pageSize, String filter);
@@ -16,4 +17,5 @@ public interface StoreService {
     String findStoreTypeByName(String name);
 
     String findStoreName(String receiptShopName);
+
 }

@@ -10,7 +10,7 @@ public interface StoreService {
 
     List<StoreDTO> searchStoreList(Long id);
 
-    StoreWithReviewDTO findStoreWithReview(Long storeId, String userEmail, int pageNo, int pageSize, String filter);
+    StoreWithReviewDTO findStoreWithReview(Long storeId, String userEmail, int pageNo, int pageSize, String filter,String sort);
 
     StoreDTO findStore(Long id);
 

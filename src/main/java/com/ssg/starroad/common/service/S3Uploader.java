@@ -88,7 +88,14 @@ public class S3Uploader {
             ObjectMetadata objectMetadata = new ObjectMetadata();
             try {
                 objectMetadata.setContentLength(file.getInputStream().available());
-                objectMetadata.setContentType(file.getContentType());
+//                objectMetadata.setContentType(file.getContentType());
+                // 파일 타입 체크후 이미지로 변경
+                if (file.getContentType().contains("image")) {
+                    objectMetadata.setContentType("image/jpeg");
+                } else {
+                    objectMetadata.setContentType(file.getContentType());
+                }
+
                 // 권한 공개
                 objectMetadata.setHeader("x-amz-acl", "public-read");
 

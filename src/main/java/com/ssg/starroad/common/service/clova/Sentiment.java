@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssg.starroad.review.DTO.SentimentDTO;
+import com.ssg.starroad.review.DTO.SentimentDetailDTO;
 import com.ssg.starroad.review.entity.ReviewSentiment;
 import com.ssg.starroad.review.enums.ConfidenceType;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +33,7 @@ public class Sentiment {
 
     private final String clovaUrl = "https://naveropenapi.apigw.ntruss.com/sentiment-analysis/v1/analyze";
 
-    public List<ReviewSentiment> getSentiment(String content) {
+    public SentimentDTO getSentiment(String content) {
 
         // 요청 설정
         // 요청 헤더 설정
@@ -52,6 +54,8 @@ public class Sentiment {
 
         // 응답 받기 위해 준비
         List<ReviewSentiment> sentimentList = new ArrayList<>();
+        List<SentimentDetailDTO> detailDTOList = new ArrayList<>();
+        SentimentDTO build = null;
         try {
             // 응답 파싱하기
             ObjectMapper objectMapper = new ObjectMapper();
@@ -65,7 +69,19 @@ public class Sentiment {
 
             // ReviewSentiment 객체로 변환
             for (JsonNode sentence : sentences) {
-                ReviewSentiment reviewSentiment = ReviewSentiment.builder()
+//                ReviewSentiment reviewSentiment = ReviewSentiment.builder()
+//                        .content(sentence.get("content").asText())
+//                        .confidence(ConfidenceType.valueOf(sentence.get("sentiment").asText().toUpperCase()))
+//                        .offset(sentence.get("offset").asInt())
+//                        .length(sentence.get("length").asInt())
+//                        .highlightLength(sentence.get("highlights").get(0).get("length").asInt())
+//                        .highlightOffset(sentence.get("highlights").get(0).get("offset").asInt())
+//                        .confidenceStat(confidenceType)
+//                        .build();
+
+                // ReviewSentiment 객체 리스트에 추가
+//                sentimentList.add(reviewSentiment);
+                SentimentDetailDTO detailDTO = SentimentDetailDTO.builder()
                         .content(sentence.get("content").asText())
                         .confidence(ConfidenceType.valueOf(sentence.get("sentiment").asText().toUpperCase()))
                         .offset(sentence.get("offset").asInt())
@@ -74,15 +90,20 @@ public class Sentiment {
                         .highlightOffset(sentence.get("highlights").get(0).get("offset").asInt())
                         .build();
 
-                // ReviewSentiment 객체 리스트에 추가
-                sentimentList.add(reviewSentiment);
+                detailDTOList.add(detailDTO);
             }
+
+            build = SentimentDTO.builder()
+                    .documentConfidence(confidenceType)
+                    .sentimentDetailDTOList(detailDTOList)
+                    .build();
         } catch (JsonMappingException e) {
             e.printStackTrace();
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         } finally {
-            return sentimentList;
+            return build;
+//            return sentimentList;
         }
     }
 }

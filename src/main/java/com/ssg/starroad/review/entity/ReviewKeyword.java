@@ -22,4 +22,6 @@ public class ReviewKeyword {
     private Long id;
 
     private String name;
+
+    private String storeType;
 }

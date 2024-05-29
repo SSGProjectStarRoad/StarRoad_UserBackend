@@ -6,6 +6,8 @@ import com.ssg.starroad.review.DTO.ReviewReceiptDTO;
 import com.ssg.starroad.review.entity.ReviewReceipt;
 import com.ssg.starroad.review.repository.ReviewReceiptRepository;
 import com.ssg.starroad.review.service.ReviewReceiptService;
+import com.ssg.starroad.shop.repository.StoreRepository;
+import com.ssg.starroad.shop.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
 public class ReviewReceiptServiceImpl implements ReviewReceiptService {
 
     private final ReviewReceiptRepository reviewReceiptRepository;
+    private final StoreRepository storeRepository;
+    private final StoreService storeService;
 
     @Override
     public ReviewReceiptDTO saveReviewReceipt(ReviewReceiptDTO reviewReceiptDTO) {
@@ -46,7 +50,8 @@ public class ReviewReceiptServiceImpl implements ReviewReceiptService {
             JsonNode paymentInfoNode = rootNode.path("images").get(0).path("receipt").path("result").path("paymentInfo");
 
             // 상점 이름 추출
-//            String shopName = storeInfoNode.path("name").path("text").asText();
+//            String shopName = storeService.findStoreName(storeInfoNode.path("name").path("text").asText());
+//            storeRepository.findByName(shopName).orElse(null);
             String shopName = "노브랜드";
             // 지점명 추출 - 필요하다면
             String subName = storeInfoNode.path("subName").path("text").asText();
@@ -94,11 +99,12 @@ public class ReviewReceiptServiceImpl implements ReviewReceiptService {
 //                    savedReviewReceipt.getAddress(), // 주소 반환 - 필요한 경우
                     savedReviewReceipt.getPaymentType(), savedReviewReceipt.getApprovalNumber(), savedReviewReceipt.getPurchaseDate());
             System.out.println("resultDTO : " + resultDTO.toString());
+            return resultDTO;
         } catch (IOException e) {
             e.printStackTrace();
+            // 예외 발생 시 적절한 예외를 던지거나 처리
+            throw new RuntimeException("OCR 처리 중 오류 발생", e);
         }
-
-        return resultDTO;
     }
 
 

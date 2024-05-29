@@ -1,27 +1,25 @@
 package com.ssg.starroad.review.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssg.starroad.common.service.S3Uploader;
-import com.ssg.starroad.review.DTO.*;
+import com.ssg.starroad.review.DTO.ResponseReviewDTO;
+import com.ssg.starroad.review.DTO.ReviewDTO;
+import com.ssg.starroad.review.DTO.ReviewReceiptDTO;
+import com.ssg.starroad.review.DTO.ReviewRequestDTO;
 import com.ssg.starroad.review.entity.Review;
-import com.ssg.starroad.review.entity.ReviewImage;
 import com.ssg.starroad.review.repository.ReviewImageRepository;
 import com.ssg.starroad.review.service.ReviewFeedbackService;
 import com.ssg.starroad.review.service.ReviewReceiptService;
 import com.ssg.starroad.review.service.ReviewService;
-import com.ssg.starroad.shop.entity.Store;
-import com.ssg.starroad.shop.repository.StoreRepository;
-import com.ssg.starroad.user.entity.User;
-import com.ssg.starroad.user.repository.UserRepository;
+import com.ssg.starroad.user.dto.RankUserDTO;
+import com.ssg.starroad.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @RequestMapping("/reviews")
 @RestController
@@ -31,11 +29,8 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final ReviewReceiptService reviewReceiptService;
     private final ReviewFeedbackService reviewFeedbackService;
-    private final StoreRepository storeRepository;
-    private final UserRepository userRepository;
-    private final S3Uploader s3Uploader;
     private final ReviewImageRepository imageRepository;
-    private final ReviewImageRepository reviewImageRepository;
+    private final UserService userService;
 
 
     @PostMapping("/write")
@@ -67,26 +62,26 @@ public class ReviewController {
     }
 
 
-
     @GetMapping
-    public ResponseEntity<ResponseReviewDTO> getAllReviews(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<ResponseReviewDTO> getAllReviews(@RequestParam String userEmail,
+                                                           @RequestParam(defaultValue = "0") int page,
                                                            @RequestParam(defaultValue = "10") int size) {
         try {
-            ResponseReviewDTO responseReviewDTO = reviewService.findAllReview(page, size);
+            ResponseReviewDTO responseReviewDTO = reviewService.findAllReview(userEmail, page, size);
             return ResponseEntity.ok(responseReviewDTO);
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().build();
         }
     }
 
     @GetMapping("/following")
-    public ResponseEntity<ResponseReviewDTO> getFollowingReviews(@RequestParam Long id,
+    public ResponseEntity<ResponseReviewDTO> getFollowingReviews(@RequestParam String userEmail,
                                                                  @RequestParam(defaultValue = "0") int page,
                                                                  @RequestParam(defaultValue = "10") int size) {
-        System.out.printf("following 리뷰 메소드 진입");
+        System.out.printf("CReviewController::getFollowingReviews userEmail : %s\n", userEmail);
         try {
             System.out.printf("try문 실행");
-            ResponseReviewDTO responseReviewDTO = reviewService.findFollowingReview(id, page, size);
+            ResponseReviewDTO responseReviewDTO = reviewService.findFollowingReview(userEmail, page, size);
             return ResponseEntity.ok(responseReviewDTO);
         } catch (RuntimeException e) {
             System.out.printf(e.getMessage());
@@ -111,51 +106,39 @@ public class ReviewController {
     @PostMapping("/submit")
     public ResponseEntity<String> submitSurvey(
             @RequestPart("review") String reviewStr, // JSON 문자열로 받습니다.
-            @RequestPart("images") List<MultipartFile> uploadedImages) throws IOException {
+            @RequestPart(value = "images", required = false) List<MultipartFile> uploadedImages) throws IOException {
 
+        System.out.printf("UploadedImaged : " + uploadedImages);
         // JSON 문자열을 ReviewDTO 객체로 변환합니다.
         ReviewDTO reviewDTO = new ObjectMapper().readValue(reviewStr, ReviewDTO.class);
 
-        System.out.println("reviewSelectionDTO toString : " + reviewDTO.toString());
+        ResponseEntity<String> result = reviewService.saveSurvey(reviewDTO, uploadedImages);
 
-        User user = userRepository.findBynickname(reviewDTO.getUserNickname()).orElseThrow(() -> new IllegalArgumentException("User not found for the nickname: " + reviewDTO.getUserNickname()));
-        // Store 엔티티가 아직 저장되지 않은 경우 저장
-        Store store = storeRepository.findByName(reviewDTO.getShopName()).orElseThrow(() -> new IllegalArgumentException("Store not found for the shop name: " + reviewDTO.getShopName()));
-        System.out.printf("Store Id : " + store.getId());
-        // Review 엔티티 생성 및 저장
-        Review savedReview = reviewService.createReview(Review.builder()
-                .user(user)
-                .store(store)
-                .paymentNum(reviewDTO.getPaymentNum())
-                .contents(reviewDTO.getContents())
-                .visible(true)
-                .likeCount(0L)
-                .build());
-        Long reviewId = savedReview.getId();
-
-        MultipartFile[] imagesArray = uploadedImages.toArray(new MultipartFile[0]);
-
-        List<String> imageUrls = s3Uploader.upload(imagesArray, "reviews");
-        List<String> urls = imageUrls.stream().map(url -> url.split("\\[|\\]")[1]).toList();
-//        String url = imageUrls.split("\\[|\\]")[1];
-
-        // surveyData를 합쳐서 ReviewFeedbackDTO 생성
-        String combinedSurveyData = reviewDTO.getCombinedSurveyData();
-        ReviewFeedbackDTO reviewFeedbackDTO = ReviewFeedbackDTO.builder()
-                .reviewId(reviewId)
-                .reviewFeedbackSelection(combinedSurveyData)
-                .build();
-
-
-        urls.stream().map(url -> reviewImageRepository.save(ReviewImage.builder()
-                .review(savedReview)
-                .imagePath(url)
-                .build()));
-
-        reviewFeedbackService.addReviewFeedback(reviewFeedbackDTO);
-
-        return ResponseEntity.ok("설문이 성공적으로 제출되었습니다!");
+        return result;
     }
 
+    @GetMapping("/rank")
+    public ResponseEntity<List<RankUserDTO>> getRankUser(@RequestParam String userEmail) {
+        List<RankUserDTO> rankUserDTOS = userService.getRankUser(userEmail);
+
+        return ResponseEntity.ok(rankUserDTOS);
+    }
+
+    @GetMapping("/allUser")
+    public ResponseEntity<List<RankUserDTO>> getAllUser(@RequestParam String userEmail) {
+        List<RankUserDTO> rankUserDTOS = userService.getAllUser(userEmail);
+
+        return ResponseEntity.ok(rankUserDTOS);
+    }
+
+    @PostMapping("/addFollowUser")
+    public ResponseEntity<String> getAllReviews(@RequestParam String userName,
+                                                @RequestParam String userEmail
+    ) {
+        System.out.printf("CReviewController getAllReviews userName : %s, userEmail : %s", userName, userEmail);
+        String followState = userService.addFollowUser(userName, userEmail);
+
+        return ResponseEntity.ok("팔로우 성공");
+    }
 }
 

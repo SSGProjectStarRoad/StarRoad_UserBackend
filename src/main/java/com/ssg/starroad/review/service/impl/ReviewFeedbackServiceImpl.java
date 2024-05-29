@@ -8,6 +8,8 @@ import com.ssg.starroad.review.repository.ReviewFeedbackRepository;
 import com.ssg.starroad.review.repository.ReviewRepository;
 import com.ssg.starroad.review.service.ReviewFeedbackService;
 import com.ssg.starroad.review.service.ReviewSelectionService;
+import com.ssg.starroad.user.entity.User;
+import com.ssg.starroad.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,7 @@ public class ReviewFeedbackServiceImpl implements ReviewFeedbackService {
     private final ReviewRepository reviewRepository;
     private final S3Uploader s3Uploader;
     private final ReviewSelectionService reviewSelectionService;
+    private final UserRepository userRepository;
 
     @Override
     public List<ReviewFeedbackDTO> getReviewFeedback(Long reviewId) {
@@ -37,6 +40,20 @@ public class ReviewFeedbackServiceImpl implements ReviewFeedbackService {
     @Transactional
     @Override
     public ReviewFeedbackDTO addReviewFeedback(ReviewFeedbackDTO reviewFeedbackDTO) {
+        System.out.println("addReviewFeedBack 진입");
+        Long userId = reviewFeedbackDTO.getId();
+        User user = userRepository.findById(userId).get();
+
+        Integer reviewExp = user.getReviewExp();
+        Integer additionalPoint = reviewExp < 100 ? 100 : reviewExp < 200 ? 200 : 300;
+        System.out.println("addReviewFeedBack User : " + user.toString());
+        // 기존 User 엔티티를 업데이트합니다.
+        user.setReviewExp(user.getReviewExp() + 10);
+        user.setPoint(user.getPoint() + additionalPoint);
+
+        // 변경된 User 엔티티를 저장합니다.
+        userRepository.save(user);
+
         // reviewFeedbackSelection을 ','를 기준으로 나눠 String 배열에 담는다.
         String[] selections = reviewFeedbackDTO.getReviewFeedbackSelection().split(",");
         System.out.printf("selections : " + selections);

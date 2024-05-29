@@ -1,14 +1,11 @@
 package com.ssg.starroad.review.DTO;
 
 import com.ssg.starroad.review.enums.ConfidenceType;
-import com.ssg.starroad.user.entity.User;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,6 +19,7 @@ public class ReviewDTO {
     private String userNickname;
     private Long id;
     private Long userId;
+    private String userEmail;
     private String imagePath;
     private Long storeId;
     private boolean visible;

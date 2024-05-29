@@ -25,8 +25,8 @@ public class ReviewSentiment {
     private Review review;
 
     private String content;
-    private int offset;
-    private int length;
+    private int totalOffset;
+    private int totalLength;
 
     @Enumerated(EnumType.STRING)
     private ConfidenceType confidence;

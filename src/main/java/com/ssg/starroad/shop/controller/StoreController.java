@@ -35,12 +35,11 @@ public class StoreController {
             @RequestParam String userEmail,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String filter) {
+            @RequestParam(required = false) String filter,
+            @RequestParam(required = false) String sort) {
         try {
-
-            String test = "choijh9023@naver.com";
-            log.info("Received request for store ID: {}, userEmail: {}, page: {}, size: {}, filter: ", id, test, page, size,filter);
-            StoreWithReviewDTO storeWithReviewDTO = storeService.findStoreWithReview(id, test, page, size,filter);
+            log.info("Received request for store ID: {}, userEmail: {}, page: {}, size: {}, filter: {}, sort: {}", id, userEmail, page, size, filter, sort);
+            StoreWithReviewDTO storeWithReviewDTO = storeService.findStoreWithReview(id, userEmail, page, size, filter, sort);
             return ResponseEntity.ok(storeWithReviewDTO);
         } catch (RuntimeException e) {
             log.error("리뷰가 있는 상점을 가져오는데 실패했습니다", e);
@@ -48,18 +47,16 @@ public class StoreController {
         }
     }
 
-    // 특정 매장의 가이드 맵을 조회하는 요청을 처리하는 메소드입니다.
+
     @GetMapping("/{id}/guidemap")
     public ResponseEntity<StoreDTO> StoreGetGuidemapById(@PathVariable Long id) {
-
         try {
-            // 매장 서비스를 통해 특정 매장의 가이드 맵을 조회합니다.
+            log.info("Fetching guide map for store ID: {}", id);
             StoreDTO storeDTO = storeService.findStore(id);
-            // 조회된 가이드 맵을 응답으로 반환합니다.
-            log.info(storeDTO.toString());
+            log.info("StoreDTO: {}", storeDTO);
             return ResponseEntity.ok(storeDTO);
         } catch (RuntimeException e) {
-            // 조회 중에 예외가 발생한 경우 404 응답을 반환합니다.
+            log.error("Failed to fetch guide map for store ID: {}", id, e);
             return ResponseEntity.notFound().build();
         }
     }

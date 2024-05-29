@@ -10,6 +10,7 @@ import com.ssg.starroad.review.repository.ReviewRepository;
 import com.ssg.starroad.review.service.ReviewFeedbackService;
 import com.ssg.starroad.review.service.ReviewImageService;
 import com.ssg.starroad.review.service.ReviewService;
+import com.ssg.starroad.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -39,6 +40,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewImageService reviewImageService; // ReviewImageService 인젝션
     private final ReviewFeedbackService reviewFeedbackService;
     private final ReviewFollowRepository reviewFollowRepository;
+    private final UserRepository userRepository;
 
     @Override
     public Long countReviewsByUserId(Long userId) {
@@ -179,6 +181,43 @@ public class ReviewServiceImpl implements ReviewService {
         Page<Review> reviewPage = reviewRepository.findAllByUserIds(toUserIds, pageable);
 
 //        Page<Review> reviewPage = reviewFollowRepository.findToUserIdsByFromUserId(id).stream().map(followId -> reviewRepository.findAllWithPageByUserId(followId, pageable)).toList().stream().findFirst().orElse(null);
+
+        List<ReviewDTO> reviewDTOList = reviewPage.stream()
+                .map(review -> {
+                    List<ReviewImageDTO> reviewImageDTOs = reviewImageService.getReviewImages(review.getId());
+                    List<ReviewFeedbackDTO> reviewFeedbackDTOs = reviewFeedbackService.getReviewFeedback(review.getId());
+                    Long userReviewCount = countReviewsByUserId(review.getUser().getId());
+
+                    return ReviewDTO.builder()
+                            .id(review.getId())
+                            .userId(review.getUser().getId())
+                            .userNickname(review.getUser().getNickname())
+                            .imagePath(review.getUser().getImagePath())
+                            .storeId(review.getStore().getId())
+                            .visible(review.isVisible())
+                            .createDate(review.getCreatedAt())
+                            .likeCount(review.getLikeCount())
+                            .contents(review.getContents())
+                            .summary(review.getSummary())
+                            .confidence(review.getConfidence())
+                            .reviewcount(userReviewCount)
+                            .reviewImages(reviewImageDTOs)
+                            .reviewFeedbacks(reviewFeedbackDTOs)
+                            .build();
+                })
+                .collect(Collectors.toList());
+        return ResponseReviewDTO.builder()
+                .reviews(reviewDTOList)
+                .pageNumber(reviewPage.getNumber())
+                .pageSize(reviewPage.getSize())
+                .hasNext(reviewPage.hasNext())
+                .build();
+    }
+
+    public ResponseReviewDTO getUserReview(String email,int pageNo, int pageSize){
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Long userId = userRepository.findByEmail(email).orElseThrow().getId();
+        Page<Review> reviewPage = reviewRepository.findAllByUserIds(Collections.singletonList(userId), pageable);
 
         List<ReviewDTO> reviewDTOList = reviewPage.stream()
                 .map(review -> {

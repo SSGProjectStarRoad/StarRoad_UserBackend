@@ -23,4 +23,6 @@ public class Reward extends BaseTimeEntity {
     private Long id;
 
     private String name;
+
+    private String rewardImagePath;
 }

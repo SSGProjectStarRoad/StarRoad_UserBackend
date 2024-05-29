@@ -21,7 +21,7 @@ public class RewardHistoryRepositoryCustom{
         QReward reward = QReward.reward;
 
         return queryFactory
-                .select(rewardHistory.rewardId, reward.name, rewardHistory.id.count())
+                .select(rewardHistory.rewardId, reward.name ,rewardHistory.id.count(),reward.rewardImagePath)
                 .from(rewardHistory)
                 .leftJoin(reward).on(rewardHistory.rewardId.eq(reward.id))  // 명확한 조인 조건 사용
                 .where(rewardHistory.user.id.eq(userId))

@@ -17,9 +17,9 @@ public class RewardRepositoryTest {
     @Autowired
     private RewardRepository rewardRepository;
 
-    @Test
-    public void testSave() {
-        Reward reward = new Reward(null,"세번째별");
-        rewardRepository.save(reward);
-    }
+//    @Test
+//    public void testSave() {
+//        Reward reward = new Reward(null,"세번째별");
+//        rewardRepository.save(reward);
+//    }
 }

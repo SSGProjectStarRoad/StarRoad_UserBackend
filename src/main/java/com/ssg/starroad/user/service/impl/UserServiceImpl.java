@@ -148,7 +148,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-
     public boolean updatePassword(String email, String newPassword) {
         System.out.println("Searching for user with email: " + email); // 로그 추가
         User user = userRepository.findByEmail(email).orElse(null);

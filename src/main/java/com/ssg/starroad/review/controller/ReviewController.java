@@ -88,6 +88,19 @@ public class ReviewController {
             return ResponseEntity.badRequest().build();
         }
     }
+    @GetMapping("/myreveiw")
+    public ResponseEntity<ResponseReviewDTO> getMyReviews(@RequestParam String email,
+                                                                 @RequestParam(defaultValue = "0") int page,
+                                                                 @RequestParam(defaultValue = "10") int size) {
+        System.out.printf("my 리뷰 메소드 진입");
+        try {
+            ResponseReviewDTO responseReviewDTO = reviewService.getUserReview(email, page, size);
+            return ResponseEntity.ok(responseReviewDTO);
+        } catch (RuntimeException e) {
+            System.out.printf(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
 
     @PostMapping("/submit")

@@ -369,7 +369,9 @@ public class ReviewServiceImpl implements ReviewService {
 
         return ResponseEntity.ok("설문이 성공적으로 제출되었습니다!");
     }
+
     public ResponseReviewDTO getUserReview(String email,int pageNo, int pageSize){
+
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
         Long userId = userRepository.findByEmail(email).orElseThrow().getId();
         Page<Review> reviewPage = reviewRepository.findAllByUserIds(Collections.singletonList(userId), pageable);

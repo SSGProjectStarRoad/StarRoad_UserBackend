@@ -19,6 +19,7 @@ public class RankUserDTO {
     private int reviewExp;
     private int point;
     private ActiveStatus activeStatus;
+    private boolean isFollowed;
 
     public RankUserDTO(User user) {
         this.id = user.getId();

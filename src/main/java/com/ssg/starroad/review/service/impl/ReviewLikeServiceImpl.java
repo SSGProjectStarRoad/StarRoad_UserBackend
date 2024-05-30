@@ -31,6 +31,7 @@ public class ReviewLikeServiceImpl implements ReviewLikeService {
     @Override
     @Transactional
     public ReviewLikeDTO addLike(String userEmail, Long reviewId) {
+        System.out.println("Function(addLike) - userEmail: " + userEmail + ", reviewId: " + reviewId);
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         Long userId = user.getId();

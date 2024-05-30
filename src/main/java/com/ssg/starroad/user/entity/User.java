@@ -9,10 +9,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,7 +33,8 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor
 @Embeddable
-
+@Setter
+@ToString
 public class User extends BaseTimeEntity implements UserDetails, OAuth2User {
 
 
@@ -93,7 +91,9 @@ public class User extends BaseTimeEntity implements UserDetails, OAuth2User {
         return this.providerId; // providerId를 반환
     }
 
-    public String getUserName() {return this.name;}
+    public String getUserName() {
+        return this.name;
+    }
 
     // 제네릭 타입 A를 사용하여, OAuth2User 인터페이스에서
     // 다양한 타입의 사용자 속성을 안전하게 가져오도록 설계(필수)
@@ -190,8 +190,9 @@ public class User extends BaseTimeEntity implements UserDetails, OAuth2User {
     public void changeActiveStatus(ActiveStatus newStatus) {
         this.activeStatus = newStatus;
     }
-    public void setProfileimgPath(String path){
-        this.imagePath=path;
+
+    public void setProfileimgPath(String path) {
+        this.imagePath = path;
 
     }
 }

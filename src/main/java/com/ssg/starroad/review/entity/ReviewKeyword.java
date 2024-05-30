@@ -24,6 +24,7 @@ public class ReviewKeyword {
 
     private String name;
 
+
     @Column(name = "store_type") // 이 부분이 필요할 수 있습니다.
     private String storeType;
 }

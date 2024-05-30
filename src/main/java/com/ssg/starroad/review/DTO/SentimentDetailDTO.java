@@ -1,18 +1,23 @@
 package com.ssg.starroad.review.DTO;
 
 import com.ssg.starroad.review.enums.ConfidenceType;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Getter
 @Builder
-public class ReviewSentimentDTO {
-    private Long id;
-    private Long reviewId; // Review 엔티티의 ID
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+public class SentimentDetailDTO {
+
     private String content;
-    private int totalOffset;
-    private int totalLength;
+    private int offset;
+    private int length;
+
     private ConfidenceType confidence;
+
     private int highlightOffset;
     private int highlightLength;
 }

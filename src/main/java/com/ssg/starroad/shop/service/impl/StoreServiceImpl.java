@@ -19,10 +19,10 @@ import com.ssg.starroad.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +37,7 @@ public class StoreServiceImpl implements StoreService {
     private final ReviewService reviewService;
     private final ReviewSentimentRepository reviewSentimentRepository;
 
+
     private final ReviewKeywordRepository reviewKeywordRepository;
     private final ReviewLikeRepository reviewLikeRepository;
     private final UserRepository userRepository;
@@ -48,7 +49,6 @@ public class StoreServiceImpl implements StoreService {
 
         return reviewKeywordRepository.findAllByStoreType(store.getStoreType());
     }
-
     @Override
     public List<StoreDTO> searchStoreList(Long id) {
         // 주어진 complexShoppingmallId로 매장 목록을 조회합니다.
@@ -60,8 +60,10 @@ public class StoreServiceImpl implements StoreService {
 
         return storeDTOList;
     }
+
     @Override
     public StoreWithReviewDTO findStoreWithReview(Long storeId, String userEmail, int pageNo, int pageSize, String filter, String sort, String keyword) {
+
         // 주어진 storeId로 스토어를 조회합니다.
         Store store = storeRepository.findById(storeId).orElseThrow(() -> new RuntimeException("존재하지 않는 스토어입니다."));
 
@@ -153,8 +155,6 @@ public class StoreServiceImpl implements StoreService {
     }
 
 
-
-
     @Override
     public StoreDTO findStore(Long id) {
         Store store = storeRepository.findById(id).orElseThrow(() -> new RuntimeException("존재하지 않은 매장입니다"));
@@ -168,15 +168,21 @@ public class StoreServiceImpl implements StoreService {
                 .build();
 
 
-
-
         return storeDTO;
     }
+
     @Override
     // 매장 이름을 이용해 매장을 조회하고 매장 유형을 반환하는 메소드
     public String findStoreTypeByName(String name) {
         Store store = storeRepository.findByName(name).orElseThrow(() -> new RuntimeException("존재하지 않는 스토어입니다."));
         return store.getStoreType();
+    }
+
+    @Override
+    public String findStoreName(String receiptShopName) {
+        return storeRepository.findByName(receiptShopName)
+                .map(Store::getName) // Store 객체에서 상점 이름을 추출
+                .orElseThrow(() -> new RuntimeException("Store with name '" + receiptShopName + "' not found"));
     }
 
 }

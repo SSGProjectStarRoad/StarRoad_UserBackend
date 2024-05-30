@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FollowRepository extends JpaRepository<Follow, Long> {
     @Query("SELECT COUNT(f) FROM Follow f WHERE f.fromUser.id = :userId")
@@ -25,4 +26,8 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     @Modifying
     @Query("DELETE FROM Follow f WHERE f.fromUser.id = :fromUserId AND f.toUser.id = :toUserId")
     void deleteByFromUserIdAndToUserId(@Param("fromUserId") Long fromUserId, @Param("toUserId") Long toUserId);
+
+    Optional<Follow> findByFromUserAndToUser(User fromUser, User toUser);
+
+    boolean existsByFromUserIdAndToUserId(Long fromUserId, Long toUserId);
 }

@@ -53,7 +53,7 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public StoreWithReviewDTO findStoreWithReview(Long storeId, String userEmail, int pageNo, int pageSize, String filter) {
+    public StoreWithReviewDTO findStoreWithReview(Long storeId, String userEmail, int pageNo, int pageSize, String filter,String sort) {
 
         // 주어진 storeId로 스토어를 조회합니다.
         Store store = storeRepository.findById(storeId).orElseThrow(() -> new RuntimeException("존재하지 않는 스토어입니다."));

@@ -178,7 +178,7 @@ public class StoreServiceImpl implements StoreService {
         return store.getStoreType();
     }
 
-    @Override
+
     public String findStoreName(String receiptShopName) {
         return storeRepository.findByName(receiptShopName)
                 .map(Store::getName) // Store 객체에서 상점 이름을 추출

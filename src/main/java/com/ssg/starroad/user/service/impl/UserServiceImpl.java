@@ -211,39 +211,42 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<RankUserDTO> getRankUser(String email) {
         List<User> users = userRepository.findAll();
-
-        Long id = findByEmail(email).get().getId();
+        Long currentUserId = findByEmail(email).get().getId();
 
         // id 값과 동일한 값을 제외하고 나머지 사용자들 선택
         List<User> filteredUsers = users.stream()
-                .filter(user -> !user.getId().equals(id))
+                .filter(user -> !user.getId().equals(currentUserId))
                 .collect(Collectors.toList());
 
         // reviewExp 필드를 기준으로 상위 3명의 사용자만 선택
-        List<User> topUsers = users.stream()
+        List<User> topUsers = filteredUsers.stream()
                 .sorted(Comparator.comparingInt(User::getReviewExp).reversed())
                 .limit(3)
                 .collect(Collectors.toList());
 
-        // 상위 3명의 사용자 목록을 출력 또는 다른 작업 수행
         topUsers.forEach(System.out::println);
 
         // User 객체를 RankUserDTO 객체로 변환
         List<RankUserDTO> rankUserDTOS = topUsers.stream()
-                .map(user -> RankUserDTO.builder()
-                        .id(user.getId())
-                        .name(user.getName())
-                        .nickname(user.getNickname())
-                        .email(user.getEmail())
-                        .imagePath(user.getImagePath())
-                        .reviewExp(user.getReviewExp())
-                        .point(user.getPoint())
-                        .activeStatus(user.getActiveStatus())
-                        .build())
+                .map(user -> {
+                    boolean isFollowed = followRepository.existsByFromUserIdAndToUserId(currentUserId, user.getId());
+                    return RankUserDTO.builder()
+                            .id(user.getId())
+                            .name(user.getName())
+                            .nickname(user.getNickname())
+                            .email(user.getEmail())
+                            .imagePath(user.getImagePath())
+                            .reviewExp(user.getReviewExp())
+                            .point(user.getPoint())
+                            .activeStatus(user.getActiveStatus())
+                            .isFollowed(isFollowed)
+                            .build();
+                })
                 .collect(Collectors.toList());
 
         return rankUserDTOS;
     }
+
 
     @Override
     public List<RankUserDTO> getAllUser(String email) {

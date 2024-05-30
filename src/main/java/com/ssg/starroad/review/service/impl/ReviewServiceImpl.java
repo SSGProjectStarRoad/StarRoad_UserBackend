@@ -51,7 +51,6 @@ public class ReviewServiceImpl implements ReviewService {
     private final UserRepository userRepository;
 
     private final ReviewLikeRepository reviewLikeRepository;
-    private final UserRepository userRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final StoreRepository storeRepository;
     private final S3Uploader s3Uploader;
@@ -370,8 +369,9 @@ public class ReviewServiceImpl implements ReviewService {
         reviewFeedbackService.addReviewFeedback(reviewFeedbackDTO);
 
         return ResponseEntity.ok("설문이 성공적으로 제출되었습니다!");
+    }
 
-    public ResponseReviewDTO getUserReview(String email,int pageNo, int pageSize){
+    public ResponseReviewDTO getUserReview(String email, int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
         Long userId = userRepository.findByEmail(email).orElseThrow().getId();
         Page<Review> reviewPage = reviewRepository.findAllByUserIds(Collections.singletonList(userId), pageable);

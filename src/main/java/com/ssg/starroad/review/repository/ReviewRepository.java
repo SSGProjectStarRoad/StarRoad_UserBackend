@@ -42,4 +42,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT r FROM Review r JOIN ReviewFeedback rf ON r.id = rf.review.id WHERE r.store.id = :storeId AND rf.reviewFeedbackSelection = :selection")
     Page<Review> findAllWithPageByStoreIdAndReviewFeedbackSelection(@Param("storeId") Long storeId, @Param("selection") String selection, Pageable pageable);
+    // 리뷰 ID 목록을 기반으로 페이징하여 리뷰를 조회하는 메서드 추가
+    Page<Review> findByIdIn(List<Long> ids, Pageable pageable);
+
+    // 새 메소드 추가
+    Page<Review> findByStoreIdAndContentsContaining(Long storeId, String keyword, Pageable pageable);
+
+
 }

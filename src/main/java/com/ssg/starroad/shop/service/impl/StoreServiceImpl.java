@@ -4,9 +4,9 @@ import com.ssg.starroad.review.DTO.ReviewDTO;
 import com.ssg.starroad.review.DTO.ReviewFeedbackDTO;
 import com.ssg.starroad.review.DTO.ReviewImageDTO;
 import com.ssg.starroad.review.entity.Review;
-import com.ssg.starroad.review.repository.ReviewImageRepository;
-import com.ssg.starroad.review.repository.ReviewLikeRepository;
-import com.ssg.starroad.review.repository.ReviewRepository;
+import com.ssg.starroad.review.entity.ReviewKeyword;
+import com.ssg.starroad.review.entity.ReviewSentiment;
+import com.ssg.starroad.review.repository.*;
 import com.ssg.starroad.review.service.ReviewFeedbackService;
 import com.ssg.starroad.review.service.ReviewImageService;
 import com.ssg.starroad.review.service.ReviewService;
@@ -35,11 +35,20 @@ public class StoreServiceImpl implements StoreService {
     private final ReviewImageService reviewImageService; // ReviewImageService 인젝션
     private final ReviewFeedbackService reviewFeedbackService;
     private final ReviewService reviewService;
+    private final ReviewSentimentRepository reviewSentimentRepository;
 
 
+    private final ReviewKeywordRepository reviewKeywordRepository;
     private final ReviewLikeRepository reviewLikeRepository;
     private final UserRepository userRepository;
 
+
+    @Override
+    public List<ReviewKeyword> getKeywordsByStoreCategory(Long storeId) {
+        Store store = storeRepository.findById(storeId).orElseThrow(() -> new RuntimeException("존재하지 않는 스토어입니다."));
+
+        return reviewKeywordRepository.findAllByStoreType(store.getStoreType());
+    }
     @Override
     public List<StoreDTO> searchStoreList(Long id) {
         // 주어진 complexShoppingmallId로 매장 목록을 조회합니다.
@@ -53,7 +62,7 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public StoreWithReviewDTO findStoreWithReview(Long storeId, String userEmail, int pageNo, int pageSize, String filter,String sort) {
+    public StoreWithReviewDTO findStoreWithReview(Long storeId, String userEmail, int pageNo, int pageSize, String filter, String sort, String keyword) {
 
         // 주어진 storeId로 스토어를 조회합니다.
         Store store = storeRepository.findById(storeId).orElseThrow(() -> new RuntimeException("존재하지 않는 스토어입니다."));
@@ -72,8 +81,13 @@ public class StoreServiceImpl implements StoreService {
         // 스토어 ID와 필터 조건에 따라 리뷰 페이지를 조회합니다.
         Page<Review> reviewPage;
         if (filter == null || filter.isEmpty()) {
-            // 필터가 없으면 모든 리뷰를 조회합니다.
-            reviewPage = reviewRepository.findAllWithPageByStoreId(storeId, pageable);
+            if (keyword == null || keyword.isEmpty()) {
+                // 필터와 키워드가 없으면 모든 리뷰를 조회합니다.
+                reviewPage = reviewRepository.findAllWithPageByStoreId(storeId, pageable);
+            } else {
+                // 키워드가 있으면 Review의 contents 필드를 사용하여 리뷰를 조회합니다.
+                reviewPage = reviewRepository.findByStoreIdAndContentsContaining(storeId, keyword, pageable);
+            }
         } else {
             // 필터가 있으면 필터 조건에 맞는 리뷰만 조회합니다.
             reviewPage = reviewRepository.findAllWithPageByStoreIdAndReviewFeedbackSelection(storeId, filter, pageable);

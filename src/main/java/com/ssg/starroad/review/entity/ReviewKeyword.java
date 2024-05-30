@@ -1,5 +1,6 @@
 package com.ssg.starroad.review.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -23,5 +24,7 @@ public class ReviewKeyword {
 
     private String name;
 
+
+    @Column(name = "store_type") // 이 부분이 필요할 수 있습니다.
     private String storeType;
 }

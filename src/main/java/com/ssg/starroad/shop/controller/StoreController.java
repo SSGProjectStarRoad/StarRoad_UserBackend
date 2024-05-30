@@ -1,5 +1,6 @@
 package com.ssg.starroad.shop.controller;
 
+import com.ssg.starroad.review.entity.ReviewKeyword;
 import com.ssg.starroad.shop.DTO.StoreDTO;
 import com.ssg.starroad.shop.DTO.StoreWithReviewDTO;
 import com.ssg.starroad.shop.service.StoreService;
@@ -19,6 +20,21 @@ public class StoreController {
     private static final Logger log = LoggerFactory.getLogger(StoreController.class);
     private final StoreService storeService;
 
+
+
+    @GetMapping("/{id}/keywords")
+    public ResponseEntity<List<ReviewKeyword>> getStoreKeywords(@PathVariable Long id) {
+        try {
+            List<ReviewKeyword> keywords = storeService.getKeywordsByStoreCategory(id);
+            return ResponseEntity.ok(keywords);
+        } catch (RuntimeException e) {
+            log.error("Failed to fetch keywords for store ID: {}", id, e);
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
+
     // 메인 매장 목록을 검색하는 요청을 처리하는 메소드입니다.
     @GetMapping("/main")
     public ResponseEntity<List<StoreDTO>> StoreSearch() {
@@ -36,10 +52,11 @@ public class StoreController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String filter,
-            @RequestParam(required = false) String sort) {
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) String keyword) {
         try {
-            log.info("Received request for store ID: {}, userEmail: {}, page: {}, size: {}, filter: {}, sort: {}", id, userEmail, page, size, filter, sort);
-            StoreWithReviewDTO storeWithReviewDTO = storeService.findStoreWithReview(id, userEmail, page, size, filter, sort);
+            log.info("Received request for store ID: {}, userEmail: {}, page: {}, size: {}, filter: {}, sort: {}, keyword: {}", id, userEmail, page, size, filter, sort, keyword);
+            StoreWithReviewDTO storeWithReviewDTO = storeService.findStoreWithReview(id, userEmail, page, size, filter, sort,keyword);
             return ResponseEntity.ok(storeWithReviewDTO);
         } catch (RuntimeException e) {
             log.error("리뷰가 있는 상점을 가져오는데 실패했습니다", e);

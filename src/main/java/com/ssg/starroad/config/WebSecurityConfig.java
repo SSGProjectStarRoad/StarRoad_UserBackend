@@ -60,11 +60,11 @@ public class WebSecurityConfig{
                 .sessionManagement(sessionManagementConfig -> sessionManagementConfig
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/user/login","/login/**","/user/logout","/user/join/**","/oauth2/**","/api/token/**","/auth/**").permitAll()
+                        .requestMatchers("/user/login","/login/**","/user/logout","/user/join/**","/oauth2/**","/api/token/**","/auth/**","/user/update-password").permitAll()
                         .requestMatchers("/api/oauth2/**").permitAll()
                         .requestMatchers("/review-likes/**").permitAll()
                         .requestMatchers("/store/**").permitAll()
-                        .requestMatchers("/user/update-profile","/user/update-password","/user/details","/user/inactive").authenticated()
+                        .requestMatchers("/user/update-profile","/user/details","/user/inactive").authenticated()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth -> oauth
                         .loginPage("/user/login")

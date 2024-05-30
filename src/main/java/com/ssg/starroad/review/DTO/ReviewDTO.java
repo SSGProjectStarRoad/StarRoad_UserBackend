@@ -21,6 +21,7 @@ public class ReviewDTO {
     private Long userId;
     private String userEmail;
     private String imagePath;
+    private boolean following; //팔로우 상태
     private Long storeId;
     private boolean visible;
     private Long likeCount;
@@ -32,7 +33,6 @@ public class ReviewDTO {
     private Long reviewcount; // 리뷰 갯수
     private boolean isLiked;  // 내가 추가한 필드 choims 24/05/23
     private LocalDateTime createDate;
-    @Enumerated(EnumType.STRING)
     private ConfidenceType confidence;
 
     private String shopName;

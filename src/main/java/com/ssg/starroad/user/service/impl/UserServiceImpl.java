@@ -218,10 +218,9 @@ public class UserServiceImpl implements UserService {
                 .filter(user -> !user.getId().equals(currentUserId))
                 .collect(Collectors.toList());
 
-        // reviewExp 필드를 기준으로 상위 3명의 사용자만 선택
+        // reviewExp 필드를 기준으로 내림차순 정렬
         List<User> topUsers = filteredUsers.stream()
                 .sorted(Comparator.comparingInt(User::getReviewExp).reversed())
-                .limit(3)
                 .collect(Collectors.toList());
 
         topUsers.forEach(System.out::println);

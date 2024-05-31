@@ -1,6 +1,7 @@
 package com.ssg.starroad.review.DTO;
 
 import com.ssg.starroad.review.enums.ConfidenceType;
+import com.ssg.starroad.shop.entity.Store;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.*;
@@ -35,6 +36,7 @@ public class ReviewDTO {
     private LocalDateTime createDate;
     private ConfidenceType confidence;
 
+    private Store store;
     private String shopName;
     private String purchaseDate;
     private String selectedTime;

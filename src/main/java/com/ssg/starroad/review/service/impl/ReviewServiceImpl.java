@@ -157,7 +157,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public ResponseReviewDTO findAllReview(String userEmail, int pageNo, int pageSize) {
         // 최신순으로 정렬된 Pageable 객체 생성
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "likeCount"));
         // 정렬된 Pageable 객체를 사용하여 리뷰 페이지 가져오기
         Page<Review> reviewPage = reviewRepository.findAll(pageable);
         Long userId = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.")).getId();
@@ -185,9 +185,14 @@ public class ReviewServiceImpl implements ReviewService {
                             .reviewcount(userReviewCount)
                             .reviewImages(reviewImageDTOs)
                             .reviewFeedbacks(reviewFeedbackDTOs)
+                            .store(review.getStore())
                             .build();
                 })
                 .collect(Collectors.toList());
+        List<ReviewDTO> sortedList = reviewDTOList.stream()
+                .sorted(Comparator.comparingLong(ReviewDTO::getLikeCount).reversed())
+                .collect(Collectors.toList());
+
         return ResponseReviewDTO.builder()
                 .reviews(reviewDTOList)
                 .pageNumber(reviewPage.getNumber())
@@ -234,6 +239,7 @@ public class ReviewServiceImpl implements ReviewService {
                             .reviewImages(reviewImageDTOs)
                             .reviewFeedbacks(reviewFeedbackDTOs)
                             .isLiked(isLiked)
+                            .store(review.getStore())
                             .build();
                 })
                 .collect(Collectors.toList());
@@ -370,7 +376,7 @@ public class ReviewServiceImpl implements ReviewService {
         return ResponseEntity.ok("설문이 성공적으로 제출되었습니다!");
     }
 
-    public ResponseReviewDTO getUserReview(String email,int pageNo, int pageSize){
+    public ResponseReviewDTO getUserReview(String email, int pageNo, int pageSize) {
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
         Long userId = userRepository.findByEmail(email).orElseThrow().getId();

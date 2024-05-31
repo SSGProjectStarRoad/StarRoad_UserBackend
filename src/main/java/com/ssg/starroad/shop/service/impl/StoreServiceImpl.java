@@ -15,6 +15,7 @@ import com.ssg.starroad.shop.DTO.StoreWithReviewDTO;
 import com.ssg.starroad.shop.entity.Store;
 import com.ssg.starroad.shop.repository.StoreRepository;
 import com.ssg.starroad.shop.service.StoreService;
+import com.ssg.starroad.user.repository.FollowRepository;
 import com.ssg.starroad.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -41,6 +42,7 @@ public class StoreServiceImpl implements StoreService {
     private final ReviewKeywordRepository reviewKeywordRepository;
     private final ReviewLikeRepository reviewLikeRepository;
     private final UserRepository userRepository;
+    private final FollowRepository followRepository;
 
 
     @Override
@@ -111,11 +113,14 @@ public class StoreServiceImpl implements StoreService {
                     List<ReviewFeedbackDTO> reviewFeedbackDTOs = reviewFeedbackService.getReviewFeedback(review.getId());
                     Long userReviewCount = reviewService.countReviewsByUserId(review.getUser().getId());
                     boolean isLiked = reviewLikeRepository.existsByUser_IdAndReview_Id(userId, review.getId());
+                    boolean following = followRepository.existsByFromUserIdAndToUserId(userId, review.getUser().getId());
 
                     return ReviewDTO.builder()
                             .id(review.getId())
+                            .following(following)
                             .userId(review.getUser().getId())
                             .userNickname(review.getUser().getNickname())
+                            .userEmail(review.getUser().getEmail())
                             .imagePath(review.getUser().getImagePath())
                             .storeId(review.getStore().getId())
                             .visible(review.isVisible())

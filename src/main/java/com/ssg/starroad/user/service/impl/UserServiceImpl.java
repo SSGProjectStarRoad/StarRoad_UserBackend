@@ -194,6 +194,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         user.changeActiveStatus(ActiveStatus.INACTIVE);
+        userRepository.save(user);
     }
 
     public String getProfileimg(String email) {

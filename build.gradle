@@ -64,6 +64,9 @@ dependencies {
 	// JSON
 	implementation 'org.json:json:20231013'
 
+	// thumbnailator
+	implementation 'net.coobird:thumbnailator:0.4.14'
+
 
 	// TEST IMPLEMENTATION ========================
 	// TEST DATABASE H2

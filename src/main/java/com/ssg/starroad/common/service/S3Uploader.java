@@ -5,10 +5,16 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -43,17 +49,30 @@ public class S3Uploader {
         String encodedFileName = null;
         encodedFileName = Base64.getUrlEncoder().encodeToString(fileName.getBytes(StandardCharsets.UTF_8));
 
+
         // S3에 저장될 파일명 구성
         String s3FileName = dirName + "/" + UUID.randomUUID() + "_" + encodedFileName + "." + extension;
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
+        // 파일을 byte로 변환
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
-            objectMetadata.setContentLength(multipartFile.getInputStream().available());
+            // Thumbnailator를 사용하여 이미지 리사이징
+            Thumbnails.of(multipartFile.getInputStream())
+                    .size(800, 800)
+                    .outputFormat(extension)
+                    .toOutputStream(outputStream);
+
+            byte[] resizedImageBytes = outputStream.toByteArray();
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(resizedImageBytes);
+
+
+            objectMetadata.setContentLength(resizedImageBytes.length);
             objectMetadata.setContentType(multipartFile.getContentType());
             // 권한 공개
             objectMetadata.setHeader("x-amz-acl", "public-read");
 
-            amazonS3.putObject(bucket, s3FileName, multipartFile.getInputStream(), objectMetadata);
+            amazonS3.putObject(bucket, s3FileName, inputStream, objectMetadata);
         } catch (IOException e) {
             log.error("S3 upload fail : " + fileName, e);
             return String.format("S3 upload fail: %s", multipartFile.getOriginalFilename());
@@ -72,34 +91,57 @@ public class S3Uploader {
     public List<String> upload(MultipartFile[] multipartFile, String dirName) {
         List<String> urlList = new ArrayList<>();
         for (MultipartFile file : multipartFile) {
-            // 파일명과 확장자 분리
+            // Separate file name and extension
             String originalFileName = file.getOriginalFilename();
             int lastIndex = originalFileName.lastIndexOf('.');
             String fileName = originalFileName.substring(0, lastIndex);
             String extension = originalFileName.substring(lastIndex + 1);
 
-            // 파일명 URL 인코딩
-            String encodedFileName = null;
-            encodedFileName = Base64.getUrlEncoder().encodeToString(fileName.getBytes(StandardCharsets.UTF_8));
+            // URL encode the file name
+            String encodedFileName = Base64.getUrlEncoder().encodeToString(fileName.getBytes(StandardCharsets.UTF_8));
 
-            // S3에 저장될 파일명 구성
+            // Construct the file name to be stored in S3
             String s3FileName = dirName + "/" + UUID.randomUUID() + "_" + encodedFileName + "." + extension;
 
             ObjectMetadata objectMetadata = new ObjectMetadata();
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             try {
-                objectMetadata.setContentLength(file.getInputStream().available());
-//                objectMetadata.setContentType(file.getContentType());
-                // 파일 타입 체크후 이미지로 변경
                 if (file.getContentType().contains("image")) {
+                    // Resize the image using Thumbnailator
+                    Thumbnails.of(file.getInputStream())
+                            .size(800, 800)
+                            .outputFormat(extension)
+                            .toOutputStream(outputStream);
+
+                    byte[] resizedImageBytes = outputStream.toByteArray();
+                    ByteArrayInputStream inputStream = new ByteArrayInputStream(resizedImageBytes);
+
+                    objectMetadata.setContentLength(resizedImageBytes.length);
                     objectMetadata.setContentType("image/jpeg");
+                    // Set public-read permission
+                    objectMetadata.setHeader("x-amz-acl", "public-read");
+
+                    amazonS3.putObject(bucket, s3FileName, inputStream, objectMetadata);
                 } else {
-                    objectMetadata.setContentType(file.getContentType());
+                    // Convert non-image file to a basic image (JPEG) and resize
+                    BufferedImage bufferedImage = new BufferedImage(800, 800, BufferedImage.TYPE_INT_RGB);
+                    Graphics2D g2d = bufferedImage.createGraphics();
+                    g2d.setColor(Color.WHITE); // Set background to white
+                    g2d.fillRect(0, 0, 800, 800);
+                    g2d.setColor(Color.BLACK); // Set text color to black
+                    g2d.drawString("Converted to Image", 50, 400);
+                    g2d.dispose();
+
+                    ImageIO.write(bufferedImage, "jpg", outputStream);
+                    byte[] imageBytes = outputStream.toByteArray();
+                    ByteArrayInputStream inputStream = new ByteArrayInputStream(imageBytes);
+
+                    objectMetadata.setContentLength(imageBytes.length);
+                    objectMetadata.setContentType("image/jpeg");
+                    objectMetadata.setHeader("x-amz-acl", "public-read");
+
+                    amazonS3.putObject(bucket, s3FileName, inputStream, objectMetadata);
                 }
-
-                // 권한 공개
-                objectMetadata.setHeader("x-amz-acl", "public-read");
-
-                amazonS3.putObject(bucket, s3FileName, file.getInputStream(), objectMetadata);
             } catch (IOException e) {
                 log.error("S3 upload fail : " + file.getOriginalFilename(), e);
                 urlList.add(String.format("S3 upload fail: %s", file.getOriginalFilename()));

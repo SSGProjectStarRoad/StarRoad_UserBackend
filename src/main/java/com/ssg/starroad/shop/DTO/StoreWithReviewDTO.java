@@ -35,7 +35,7 @@ public class StoreWithReviewDTO {
 
     private String imagePath;
 
-
+    private Long userId; // 로그인을 한 유저에 대한 필드
     private String storeType;
     //프로그래스바 관련필드
     private Long revisitCount;
@@ -46,4 +46,6 @@ public class StoreWithReviewDTO {
     private int pageNumber; // 현재 페이지 번호
     private int pageSize; // 페이지 크기
     private boolean hasNext; // 다음 페이지 존재 여부
+
+
 }

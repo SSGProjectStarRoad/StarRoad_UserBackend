@@ -2,17 +2,18 @@ package com.ssg.starroad.review.service.impl;
 
 import com.ssg.starroad.review.DTO.ReviewSentimentDTO;
 import com.ssg.starroad.review.entity.ReviewSentiment;
-import com.ssg.starroad.review.enums.ConfidenceType;
 import com.ssg.starroad.review.repository.ReviewRepository;
 import com.ssg.starroad.review.repository.ReviewSentimentRepository;
 import com.ssg.starroad.review.service.ReviewSentimentService;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@ToString
 public class ReviewSentimentServiceImpl implements ReviewSentimentService {
     private final ReviewSentimentRepository reviewSentimentRepository;
     private final ReviewRepository reviewRepository;
@@ -23,8 +24,8 @@ public class ReviewSentimentServiceImpl implements ReviewSentimentService {
                 .review(reviewRepository.findById(reviewSentimentDTO.getReviewId())
                         .orElseThrow(() -> new IllegalArgumentException("Review not found")))
                 .content(reviewSentimentDTO.getContent())
-                .offset(reviewSentimentDTO.getOffset())
-                .length(reviewSentimentDTO.getLength())
+                .totalOffset(reviewSentimentDTO.getTotalOffset())
+                .totalLength(reviewSentimentDTO.getTotalLength())
                 .confidence(reviewSentimentDTO.getConfidence())
                 .highlightOffset(reviewSentimentDTO.getHighlightOffset())
                 .highlightLength(reviewSentimentDTO.getHighlightLength())
@@ -67,8 +68,8 @@ public class ReviewSentimentServiceImpl implements ReviewSentimentService {
                 .id(reviewSentiment.getId())
                 .reviewId(reviewSentiment.getReview().getId())
                 .content(reviewSentiment.getContent())
-                .offset(reviewSentiment.getOffset())
-                .length(reviewSentiment.getLength())
+                .totalOffset(reviewSentiment.getTotalOffset())
+                .totalLength(reviewSentiment.getTotalLength())
                 .confidence(reviewSentiment.getConfidence())
                 .highlightOffset(reviewSentiment.getHighlightOffset())
                 .highlightLength(reviewSentiment.getHighlightLength())

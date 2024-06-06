@@ -37,7 +37,7 @@ public class CouponHistoryRepositoryCustom {
                         qCouponHistory.id.as("couponHistoryId"),
                         qCoupon.id.as("couponId"),
                         qCoupon.name.as("couponName"),
-                        qCoupon.discountRate.as("couponDiscountRate"),
+                        qCouponHistory.discountRate.as("couponDiscountRate"),
                         qCoupon.discountAmount.as("couponDiscountAmount"),
                         qCoupon.status.as("couponStatus"),
                         qCouponHistory.usageStatus.as("couponUsageStatus"),

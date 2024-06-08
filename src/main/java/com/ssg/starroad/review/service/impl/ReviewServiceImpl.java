@@ -304,7 +304,8 @@ public class ReviewServiceImpl implements ReviewService {
     public ResponseEntity<String> saveSurvey(ReviewDTO reviewDTO, List<MultipartFile> uploadedImages) {
         System.out.println("reviewSelectionDTO toString : " + reviewDTO.toString());
 
-        User user = userRepository.findByEmail(reviewDTO.getUserEmail()).orElseThrow(() -> new IllegalArgumentException("User not found for the userEmail: " + reviewDTO.getUserEmail()));
+        String email = "ekmbjh@naver.com";
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found for the userEmail: " + reviewDTO.getUserEmail()));
         System.out.println("sumbitSurvey user : " + user.toString());
         // Store 엔티티가 아직 저장되지 않은 경우 저장
         System.out.println("reviewDTO getShopName : " + reviewDTO.getShopName());

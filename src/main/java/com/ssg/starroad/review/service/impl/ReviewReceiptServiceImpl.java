@@ -71,12 +71,13 @@ public class ReviewReceiptServiceImpl implements ReviewReceiptService {
             System.out.println("Time : " + time);
 
             // 날짜와 시간 형식을 정의합니다.
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
             // 문자열로부터 LocalDate와 LocalTime을 파싱합니다.
-            LocalDate parsedDate = LocalDate.parse(date.replace(" ", ""), dateFormatter);
+            LocalDate parsedDate = LocalDate.parse(date.replace(" ", ""), formatter);
             LocalTime parsedTime = LocalTime.parse(time.replace(" ", ""), timeFormatter);
+
             System.out.println("parsedDate : " + parsedDate);
             System.out.println("parsedTime : " + parsedTime);
 
